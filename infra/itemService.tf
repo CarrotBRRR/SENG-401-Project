@@ -95,8 +95,30 @@ resource "aws_iam_policy" "dynamodb_policy" {
   })
 }
 
+resource "aws_iam_policy" "parameter_store_policy" {
+  name = "parameter_store_policy_toolshed"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "dynamodb_policy_attachment" {
   policy_arn = aws_iam_policy.dynamodb_policy.arn
+  role       = aws_iam_role.lambda_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "parameter_store_policy_attachment" {
+  policy_arn = aws_iam_policy.parameter_store_policy.arn
   role       = aws_iam_role.lambda_role.name
 }
 

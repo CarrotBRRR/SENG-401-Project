@@ -82,8 +82,6 @@ def create_query_string(dict):
         query_string = f"{key}={value}" if ind == 0 else f"{query_string}&{key}={value}"
     return query_string
 
-
-
 # test function
 def add(a, b):
     return a + b
