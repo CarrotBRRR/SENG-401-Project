@@ -9,8 +9,8 @@ def handler(event, context):
     data = json.loads(event["body"])
     try:
         item={
-            "id": str(uuid.uuid4()),
-            "name": data["name"],
+            "userID": str(uuid.uuid4()),
+            "userName": data["name"],
             "email": data["email"],
             "rating": data["rating"],
             "bio": data["bio"],
