@@ -23,6 +23,8 @@ jobs:
         cd ./backend/itemService/createItem/
         pip3 install -r requirements.txt
         pip3 install pytest
+        pip3 install boto3
+        pip3 install moto
 
     - name: Run pytest createItem
       run: |
