@@ -31,7 +31,7 @@ def insert_item_in_table(table, itemID, data):
 
     response = table.put_item(
         Item=item,
-        ReturnValues='ALL_NEW'
+        ReturnValues='ALL_OLD'
     )
     return response
 
