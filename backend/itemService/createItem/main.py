@@ -21,7 +21,7 @@ def insert_item_in_table(table, itemID, data):
     """Insert an item into the DynamoDB table."""
     item = {
         'itemID': {'S': itemID},
-        'lenderID': {'N': data['lenderID']},
+        'lenderID': {'S': data['lenderID']},
         'itemName': {'S': data['itemName']},
         'description': {'S': data['description']},
         'maxBorrowDays': {'N': data['maxBorrowDays']},
