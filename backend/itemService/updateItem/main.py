@@ -29,7 +29,7 @@ def update_item_in_table(table, itemID, newInfo):
             ':itemName': newInfo["itemName"],
             ':description': newInfo["description"],
             ':maxBorrowDays': newInfo["maxBorrowDays"],
-            ':imageURL': newInfo["image_url"],
+            ':imageURL': newInfo["image"],
             ':imageHash': newInfo["image_hash"]
         },
         ReturnValues="UPDATED_NEW"
