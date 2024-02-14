@@ -3,10 +3,6 @@ from main import *
 import os
 import pytest
 
-import sys
-sys.path.append('../createItem')
-from createItem.main import insert_item_in_table
-
 @pytest.fixture
 def aws_credentials():
     """Mocked AWS Credentials for moto."""
@@ -41,7 +37,11 @@ def test_edit_item_in_table(dynamodb_mock):
         'imageHash': "HAHAHASH"
     }
 
-    insertion = insert_item_in_table(table, "69420", mock_item)
+    table.put_item(Item=mock_item)
+
+    setup_response = table.get_item(Key={'itemID': '69420'})
+
+    assert setup_response['Item']['itemName'] == "Eye Temm"
 
     mock_update = {
         'itemName': "aight \'em",
@@ -52,6 +52,8 @@ def test_edit_item_in_table(dynamodb_mock):
     }
 
     update = update_item_in_table(table, "69420", mock_update)
+
+    assert update['ResponseMetadata']['HTTPStatusCode'] == 200
 
     response = table.get_item(Key={'itemID': '69420'})
 
