@@ -1,8 +1,11 @@
-from createItem.main import insert_item_in_table
 from moto import mock_aws
 from main import *
 import os
 import pytest
+
+import sys
+sys.path.append('../createItem')
+from main import insert_item_in_table
 
 @pytest.fixture
 def aws_credentials():
@@ -51,7 +54,7 @@ def test_edit_item_in_table(dynamodb_mock):
     update = update_item_in_table(table, "69420", mock_update)
 
     response = table.get_item(Key={'itemID': '69420'})
-    
+
     assert response['Item']['itemName'] == "aight \'em"
     assert response['Item']['description'] == "a new description"
     assert response['Item']['maxBorrowDays'] == 420
