@@ -30,7 +30,7 @@ def update_item_in_table(table, itemID, newInfo):
             ':description': newInfo["description"],
             ':maxBorrowDays': newInfo["maxBorrowDays"],
             ':imageURL': newInfo["image"],
-            ':imageHash': newInfo["image_hash"]
+            ':imageHash': newInfo["imageHash"]
         },
         ReturnValues="UPDATED_NEW"
     )
@@ -115,8 +115,8 @@ def handler(event, context):
             'itemName': itemName,
             'description': description,
             'maxBorrowDays': maxBorrowDays,
-            'image_url': image_url,
-            'image_hash': image_hash
+            'image': image_url,
+            'imageHash': image_hash
         }
 
         response = update_item_in_table(table, itemID, newInfo)
