@@ -5,7 +5,7 @@ import pytest
 
 import sys
 sys.path.append('../createItem')
-from main import insert_item_in_table
+from createItem.main import insert_item_in_table
 
 @pytest.fixture
 def aws_credentials():
