@@ -1,13 +1,12 @@
 import pytest
-import pytest
 from main import *
 from moto import mock_aws
 import boto3
+import os
 
 @pytest.fixture
 def aws_credentials():
     """Mocked AWS Credentials for moto."""
-    import os
     os.environ["AWS_ACCESS_KEY_ID"] = "testing"
     os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
     os.environ["AWS_SECURITY_TOKEN"] = "testing"
@@ -18,7 +17,7 @@ def dynamodb_mock(aws_credentials):
     with mock_aws():
         yield boto3.resource('dynamodb', region_name='ca-central-1')
 
-def test_create_item(dynamodb_mock):
+def test_insert_item_in_table(dynamodb_mock):
     table_name = 'items-30144999'
     dynamodb_mock.create_table(
         TableName=table_name,
@@ -39,7 +38,7 @@ def test_create_item(dynamodb_mock):
         'imageHash': "HAHAHASH"
     }
 
-    insertion = insert_item_in_table(dynamodb_mock, "69420", mock_item)
+    insertion = insert_item_in_table(table, "69420", mock_item)
 
     # Assert
     table = dynamodb_mock.Table(table_name)
