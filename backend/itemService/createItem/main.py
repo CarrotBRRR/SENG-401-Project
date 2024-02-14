@@ -19,17 +19,7 @@ def parse_event_body(event_body):
 
 def insert_item_in_table(table, itemID, data):
     """Insert an item into the DynamoDB table."""
-
-    item = {
-        'itemID': {'S': itemID},
-        'lenderID': {'S': data['lenderID']},
-        'itemName': {'S': data['itemName']},
-        'description': {'S': data['description']},
-        'maxBorrowDays': {'N': data['maxBorrowDays']},
-        'imageURL': {'S': data['image']},
-        'imageHash': {'S': data['imageHash']}
-    }   
-
+    
     response = table.put_item(
         Item=data,
         ReturnValues='ALL_OLD'
