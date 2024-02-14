@@ -7,11 +7,27 @@ on:
 
 jobs:
   test:
+    name: Test ${{ matrix.test-dir }}
     runs-on: ubuntu-latest
-    
+    strategy:
+      matrix:
+        test-dir:
+          - './backend/itemService/borrowItem/'
+          - './backend/itemService/createItem/'
+          - './backend/itemService/deleteItem/'
+          - './backend/itemService/getItem/'
+          - './backend/itemService/returnItem/'
+          - './backend/itemService/updateItem/'
+          - './backend/userService/createAccount/'
+          - './backend/userService/deleteAccount/'
+          - './backend/userService/getAccount/'
+          - './backend/userService/updateAccount/'
+      fail-fast: false
+
+
+
     steps:
     - uses: actions/checkout@v4
-
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -20,60 +36,10 @@ jobs:
 
     - name: Install dependencies
       run: |
-        cd ./backend/itemService/createItem/
-        pip3 install -r requirements.txt
-        pip3 install pytest
-        pip3 install boto3
-        pip3 install moto
+        pip3 install pytest boto3 moto
+        pip3 install -r ${{ matrix.test-dir }}requirements.txt
 
-    - name: Run pytest borrowItem
+    - name: Run tests in ${{ matrix.test-dir }}
       run: |
-        cd ./backend/itemService/borrowItem/
+        cd ${{ matrix.test-dir }}
         python3 -m pytest
-
-    - name: Run pytest createItem
-      run: |
-        cd ./backend/itemService/createItem/
-        python3 -m pytest
-
-    - name: Run pytest deleteItem
-      run: |
-        cd ./backend/itemService/deleteItem/
-        python3 -m pytest
-
-      
-    - name: Run pytest getItem
-      run: |
-        cd ./backend/itemService/getItem/
-        python3 -m pytest
-    
-    - name: Run pytest returnItem
-      run: |
-        cd ./backend/itemService/returnItem/
-        python3 -m pytest
-      
-    - name: Run pytest updateItem
-      run: |
-        cd ./backend/itemService/updateItem/
-        python3 -m pytest
-      
-    - name: Run pytest createAccount
-      run: |
-        cd ./backend/userService/createAccount/
-        python3 -m pytest
-      
-    - name: Run pytest deleteAccount
-      run: |
-        cd ./backend/userService/deleteAccount/
-        python3 -m pytest
-
-    - name: Run pytest getAccount
-      run: |
-        cd ./backend/userService/getAccount/
-        python3 -m pytest
-    
-    - name: Run pytest updateAccount
-      run: |
-        cd ./backend/userService/updateAccount/
-        python3 -m pytest
-
