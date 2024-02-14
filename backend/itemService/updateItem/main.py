@@ -23,8 +23,7 @@ def update_item_in_table(table, itemID, newInfo):
         Key={
             'itemID': itemID
         },
-        UpdateExpression="set itemName = :itemName, set description = :description, \
-        set maxBorrowDays = :maxBorrowDays, set imageURL = :imageURL, set imageHash = :imageHash",
+        UpdateExpression="set itemName = :itemName, set description = :description, set maxBorrowDays = :maxBorrowDays, set imageURL = :imageURL, set imageHash = :imageHash",
         ExpressionAttributeValues={
             ':itemName': newInfo["itemName"],
             ':description': newInfo["description"],
@@ -108,7 +107,7 @@ def handler(event, context):
             image_url = response["secure_url"]
             image_hash = new_image_hash
         else:
-            image_url = table.get_item(Key={"itemID": itemID})["Item"]["imageURL"]
+            image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
             image_hash = old_image_hash
 
         newInfo = {
