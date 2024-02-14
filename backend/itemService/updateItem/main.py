@@ -20,17 +20,11 @@ def update_item_in_table(table, itemID, newInfo):
         Key={
             'itemID': itemID
         },
-        UpdateExpression="set itemName = :S",
+        UpdateExpression="set itemName = :itemName, set description = :description, set maxBorrowDays = :maxBorrowDays",
         ExpressionAttributeValues={
-            ':S': newInfo["itemName"]
-        },
-        UpdateExpression="set description = :S",
-        ExpressionAttributeValues={
-            ':S': newInfo["description"]
-        },
-        UpdateExpression="set maxBorrowDays = :N",
-        ExpressionAttributeValues={
-            ':N': newInfo["maxBorrowDays"]
+            ':itemName': newInfo["itemName"],
+            ':description': newInfo["description"],
+            ':maxBorrowDays': newInfo["maxBorrowDays"]
         },
         ReturnValues="UPDATED_NEW"
     )
