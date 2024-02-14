@@ -30,11 +30,8 @@ def insert_item_in_table(table, itemID, data):
     }
 
     response = table.put_item(
-        Key={
-            'itemID': itemID
-        },
         Item=item,
-        ReturnValues="CREATED_NEW"
+        ReturnValues="ALL_NEW"
     )
     return response
 

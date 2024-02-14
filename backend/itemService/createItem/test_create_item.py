@@ -44,7 +44,7 @@ def test_insert_item_in_table(dynamodb_mock):
     table = dynamodb_mock.Table(table_name)
     response = table.get_item(Key={'id': '1234'})
 
-    assert insertion == 'CREATED_NEW'
+    assert insertion == 'ALL_NEW'
 
     assert 'Item' in response
     assert response['Item']['itemID'] == '1234'
