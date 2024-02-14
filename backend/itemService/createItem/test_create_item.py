@@ -42,7 +42,7 @@ def dynamodb_mock(aws_credentials):
 
             # Assert
             table = dynamodb_mock.Table(table_name)
-            response = table.get_item(Key={'id': '123'})
+            response = table.get_item(Key={'id': '1234'})
 
             assert 'Item' in response
             assert response['Item']['itemID'] == '1234'

@@ -33,7 +33,8 @@ def insert_item_in_table(table, itemID, data):
         Key={
             'itemID': itemID
         },
-        Item=item
+        Item=item,
+        ReturnValues="CREATED_NEW"
     )
     return response
 
