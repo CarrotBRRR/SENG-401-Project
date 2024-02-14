@@ -2,34 +2,39 @@ import boto3
 import requests
 import json
 import uuid
-import time
 import hashlib
 import base64
 
-def handler(event, context):
-    print(event)
+def get_dynamodb_table(table_name):
+    """Initialize a DynamoDB resource and get the table."""
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(table_name)
+    return table
 
-    body = event['body']
-    data = json.loads(body)
+def parse_event_body(event_body):
+    """Parse the event body, converting from JSON string to dictionary if necessary."""
+    if isinstance(event_body, str):
+        return json.loads(event_body)
+    return event_body
 
-    lenderID = data['lenderID']
-    itemName = data['name']
-    description = data['description']
-    maxBorrowDays = data['max_borrow_days']
+def insert_item_in_table(table, itemID, data):
+    """Insert an item into the DynamoDB table."""
+    item = {
+        'itemID': {'S': itemID},
+        'lenderID': {'N': data['lenderID']},
+        'itemName': {'S': data['itemName']},
+        'description': {'S': data['description']},
+        'maxBorrowDays': {'N': data['maxBorrowDays']},
+        'imageURL': {'S': data['image']},
+    }
 
-    # Create a unique item ID
-    itemID = str(uuid.uuid4())
-
-    # Get a timestamp for the item creation
-    time = str(int(time.time()))
-
-    raw_image = data['image']
-    image_bytes = base64.b64decode(raw_image)
-    filename = "/tmp/img.png"
-    with open(filename, "wb") as f:
-        f.write(image_bytes)
-
-    image_url = post_image(filename)["secure_url"]
+    response = table.put_item(
+        Key={
+            'itemID': itemID
+        },
+        Item=item
+    )
+    return response
 
 def post_image(image):
     # Get the credentials from AWS Parameter Store
@@ -81,6 +86,53 @@ def create_query_string(dict):
     for ind, (key, value) in enumerate(dict.items()):
         query_string = f"{key}={value}" if ind == 0 else f"{query_string}&{key}={value}"
     return query_string
+
+def handler(event, context):
+    try:
+        body = parse_event_body(event["body"])
+
+        lenderID = body['lenderID']
+        itemName = body['name']
+        description = body['description']
+        maxBorrowDays = body['max_borrow_days']
+
+        # Create a unique item ID
+        itemID = str(uuid.uuid4())
+
+        # Get a timestamp for the item creation
+        time = str(int(time.time()))
+
+        raw_image = body['image']
+        image_bytes = base64.b64decode(raw_image)
+        filename = "./tmp/img.png"
+        with open(filename, "wb") as f:
+            f.write(image_bytes)
+
+        image_url = post_image(filename)["secure_url"]
+
+        data  = {
+            'lenderID': lenderID,
+            'itemName': itemName,
+            'description': description,
+            'maxBorrowDays': maxBorrowDays,
+            'image': image_url,
+            'timestamp': time
+        }
+
+        table_name = 'items-30144999'
+        table = get_dynamodb_table(table_name)
+        response = insert_item_in_table(table, itemID, data)
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps(response)
+        }
+    
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps(str(e))
+        }
 
 # test function
 def add(a, b):
