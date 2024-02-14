@@ -40,14 +40,11 @@ def test_insert_item_in_table(dynamodb_mock):
 
     insertion = insert_item_in_table(table, "69420", mock_item)
 
-    # Assert
-    table = dynamodb_mock.Table(table_name)
     response = table.get_item(Key={'id': '1234'})
-
+    
     assert insertion == 'ALL_OLD'
-
     assert 'Item' in response
-    assert response['Item']['itemID'] == '1234'
+    assert response['Item']['itemID'] == '69420'
     assert response['Item']['lenderID'] == 'Len Derr'
     assert response['Item']['itemName'] == 'Eye Temm'
     assert response['Item']['description'] == 'a description'
