@@ -32,14 +32,14 @@ def test_create_item(dynamodb_mock):
     mock_item = {
         'lenderID': "Len Derr",
         'itemName': "Eye Temm",
-        'itemID': '1234',
+        'itemID': '69420',
         'description': "a description",
         'maxBorrowDays': 69,
         'image': "url.com",
         'imageHash': "HAHAHASH"
     }
 
-    insertion = insert_item_in_table(table_name, mock_item, dynamodb_mock)
+    insertion = insert_item_in_table(dynamodb_mock, "69420", mock_item)
 
     # Assert
     table = dynamodb_mock.Table(table_name)
