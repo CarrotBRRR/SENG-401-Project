@@ -42,7 +42,8 @@ def test_insert_item_in_table(dynamodb_mock):
 
     response = table.get_item(Key={'itemID': '69420'})
 
-    assert insertion['HTTPStatusCode'] == 200
+    assert insertion['ResponseMetadata']['HTTPStatusCode'] == 200
+
     assert 'Item' in response
     assert response['Item']['itemID'] == '69420'
     assert response['Item']['lenderID'] == 'Len Derr'
