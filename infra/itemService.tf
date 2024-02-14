@@ -49,6 +49,57 @@ resource "aws_lambda_function" "create_item_lambda" {
   source_code_hash = filebase64sha256("./createItem.zip")
 }
 
+resource "aws_lambda_function" "borrow_item_lambda" {
+  filename         = "./borrowItem.zip"
+  function_name    = "borrow-item-30144999"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main.handler"
+  runtime          = "python3.9"
+  timeout = 300
+  source_code_hash = filebase64sha256("./borrowItem.zip")
+}
+
+resource "aws_lambda_function" "delete_item_lambda" {
+  filename         = "./deleteItem.zip"
+  function_name    = "delete-item-30144999"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main.handler"
+  runtime          = "python3.9"
+  timeout = 300
+  source_code_hash = filebase64sha256("./deleteItem.zip")
+}
+
+resource "aws_lambda_function" "get_item_lambda" {
+  filename         = "./getItem.zip"
+  function_name    = "get-item-30144999"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main.handler"
+  runtime          = "python3.9"
+  timeout = 300
+  source_code_hash = filebase64sha256("./getItem.zip")
+}
+
+resource "aws_lambda_function" "return_item_lambda" {
+  filename         = "./returnItem.zip"
+  function_name    = "return-item-30144999"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main.handler"
+  runtime          = "python3.9"
+  timeout = 300
+  source_code_hash = filebase64sha256("./returnItem.zip")
+}
+
+resource "aws_lambda_function" "update_item_lambda" {
+  filename         = "./updateItem.zip"
+  function_name    = "update-item-30144999"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main.handler"
+  runtime          = "python3.9"
+  timeout = 300
+  source_code_hash = filebase64sha256("./updateItem.zip")
+}
+
+
 resource "aws_dynamodb_table" "items_dynamodb_table" {
   name         = "items-30144999"
   billing_mode = "PROVISIONED"
@@ -64,6 +115,65 @@ resource "aws_dynamodb_table" "items_dynamodb_table" {
   # the hash_key data type is string
   attribute {
     name = "itemID"
+    type = "S"
+  }
+
+}
+
+resource "aws_lambda_function" "create_account_lambda" {
+  filename         = "./createAccount.zip"
+  function_name    = "create-account-30144999"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main.handler"
+  runtime          = "python3.9"
+  timeout = 300
+  source_code_hash = filebase64sha256("./createAccount.zip")
+}
+
+resource "aws_lambda_function" "delete_account_lambda" {
+  filename         = "./deleteAccount.zip"
+  function_name    = "delete-account-30144999"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main.handler"
+  runtime          = "python3.9"
+  timeout = 300
+  source_code_hash = filebase64sha256("./deleteAccount.zip")
+}
+
+resource "aws_lambda_function" "get_account_lambda" {
+  filename         = "./getAccount.zip"
+  function_name    = "get-account-30144999"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main.handler"
+  runtime          = "python3.9"
+  timeout = 300
+  source_code_hash = filebase64sha256("./getAccount.zip")
+}
+
+resource "aws_lambda_function" "update_account_lambda" {
+  filename         = "./updateAccount.zip"
+  function_name    = "update-account-30144999"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main.handler"
+  runtime          = "python3.9"
+  timeout = 300
+  source_code_hash = filebase64sha256("./updateAccount.zip")
+}
+resource "aws_dynamodb_table" "users_dynamodb_table" {
+  name         = "users-30144999"
+  billing_mode = "PROVISIONED"
+
+  # up to 8KB read per second (eventually consistent)
+  read_capacity = 1
+
+  # up to 1KB per second
+  write_capacity = 1
+
+  hash_key = "userID"
+
+  # the hash_key data type is string
+  attribute {
+    name = "userID"
     type = "S"
   }
 
@@ -122,6 +232,8 @@ resource "aws_iam_role_policy_attachment" "parameter_store_policy_attachment" {
   role       = aws_iam_role.lambda_role.name
 }
 
+
+
 resource "aws_lambda_function_url" "url_create_item" {
   function_name      = aws_lambda_function.create_item_lambda.function_name
   authorization_type = "NONE"
@@ -130,6 +242,124 @@ resource "aws_lambda_function_url" "url_create_item" {
     allow_credentials = true
     allow_origins     = ["*"]
     allow_methods     = ["POST"]
+    allow_headers     = ["*"]
+    expose_headers    = ["keep-alive", "date"]
+  }
+}
+
+resource "aws_lambda_function_url" "url_borrow_item" {
+  function_name      = aws_lambda_function.borrow_item_lambda.function_name
+  authorization_type = "NONE"
+  
+  cors {
+    allow_credentials = true
+    allow_origins     = ["*"]
+    allow_methods     = ["PUT"] 
+    allow_headers     = ["*"]
+    expose_headers    = ["keep-alive", "date"]
+  }
+}
+
+resource "aws_lambda_function_url" "url_delete_item" {
+  function_name      = aws_lambda_function.delete_item_lambda.function_name
+  authorization_type = "NONE"
+
+  cors {
+    allow_credentials = true
+    allow_origins     = ["*"]
+    allow_methods     = ["DELETE"]
+    allow_headers     = ["*"]
+    expose_headers    = ["keep-alive", "date"]
+  }
+
+}
+
+resource "aws_lambda_function_url" "url_get_item" {
+  function_name      = aws_lambda_function.get_item_lambda.function_name
+  authorization_type = "NONE"
+
+  cors {
+    allow_credentials = true
+    allow_origins     = ["*"]
+    allow_methods     = ["GET"]
+    allow_headers     = ["*"]
+    expose_headers    = ["keep-alive", "date"]
+  }
+}
+
+resource "aws_lambda_function_url" "url_return_item" {
+  function_name      = aws_lambda_function.return_item_lambda.function_name
+  authorization_type = "NONE"
+
+  cors {
+    allow_credentials = true
+    allow_origins     = ["*"]
+    allow_methods     = ["PUT"]
+    allow_headers     = ["*"]
+    expose_headers    = ["keep-alive", "date"]
+  }
+}
+
+resource "aws_lambda_function_url" "url_update_item" {
+  function_name      = aws_lambda_function.update_item_lambda.function_name
+  authorization_type = "NONE"
+
+  cors {
+    allow_credentials = true
+    allow_origins     = ["*"]
+    allow_methods     = ["PUT"]
+    allow_headers     = ["*"]
+    expose_headers    = ["keep-alive", "date"]
+  }
+}
+
+resource "aws_lambda_function_url" "url_create_account" {
+  function_name      = aws_lambda_function.create_account_lambda.function_name
+  authorization_type = "NONE"
+
+  cors {
+    allow_credentials = true
+    allow_origins     = ["*"]
+    allow_methods     = ["POST"]
+    allow_headers     = ["*"]
+    expose_headers    = ["keep-alive", "date"]
+  }
+}
+
+resource "aws_lambda_function_url" "url_delete_account" {
+  function_name      = aws_lambda_function.delete_account_lambda.function_name
+  authorization_type = "NONE"
+
+  cors {
+    allow_credentials = true
+    allow_origins     = ["*"]
+    allow_methods     = ["DELETE"]
+    allow_headers     = ["*"]
+    expose_headers    = ["keep-alive", "date"]
+  }
+}
+
+resource "aws_lambda_function_url" "url_get_account" {
+  function_name      = aws_lambda_function.get_account_lambda.function_name
+  authorization_type = "NONE"
+
+  cors {
+    allow_credentials = true
+    allow_origins     = ["*"]
+    allow_methods     = ["GET"]
+    allow_headers     = ["*"]
+    expose_headers    = ["keep-alive", "date"]
+  }
+}
+
+resource "aws_lambda_function_url" "url_update_account" {
+  function_name      = aws_lambda_function.update_account_lambda.function_name
+  authorization_type = "NONE"
+
+  cors {
+    allow_credentials = true
+    allow_origins     = ["*"]
+    allow_methods     = ["PUT"]
     allow_headers     = ["*"]
     expose_headers    = ["keep-alive", "date"]
   }

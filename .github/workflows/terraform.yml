@@ -27,16 +27,107 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Install Python dependencies
+      - name: Install Python dependencies createItem
         run: |
           pip3 install -r ./backend/itemService/createItem/requirements.txt -t ./backend/itemService/createItem/
 
         
           
-      - name: Zip create item function
+      - name: Zip create createItem function
         run: |
           cd ./backend/itemService/createItem
           zip -r ../../../infra/createItem.zip .
+          cd -
+
+      - name: Install Python dependencies borrowItem
+        run: |
+          pip3 install -r ./backend/itemService/borrowItem/requirements.txt -t ./backend/itemService/borrowItem/
+      
+      - name: Zip create borrowItem function
+        run: |
+          cd ./backend/itemService/borrowItem
+          zip -r ../../../infra/borrowItem.zip .
+          cd -
+      
+      - name: Install Python dependencies deleteItem
+        run: |
+          pip3 install -r ./backend/itemService/deleteItem/requirements.txt -t ./backend/itemService/deleteItem/
+      
+      - name: Zip create deleteItem function
+        run: |
+          cd ./backend/itemService/deleteItem
+          zip -r ../../../infra/deleteItem.zip .
+          cd -
+      
+      - name: Install Python dependencies getItem
+        run: |
+          pip3 install -r ./backend/itemService/getItem/requirements.txt -t ./backend/itemService/getItem/
+        
+      - name: Zip create getItem function
+        run: |
+          cd ./backend/itemService/getItem
+          zip -r ../../../infra/getItem.zip .
+          cd -
+      
+      - name: Install Python dependencies returnItem
+        run: |
+          pip3 install -r ./backend/itemService/returnItem/requirements.txt -t ./backend/itemService/returnItem/
+
+      - name: Zip create returnItem function
+        run: |
+          cd ./backend/itemService/returnItem
+          zip -r ../../../infra/returnItem.zip .
+          cd -
+        
+      - name: Install Python dependencies updateItem
+        run: |
+          pip3 install -r ./backend/itemService/updateItem/requirements.txt -t ./backend/itemService/updateItem/
+      
+      - name: Zip create updateItem function
+        run: |
+          cd ./backend/itemService/updateItem
+          zip -r ../../../infra/updateItem.zip .
+          cd -
+        
+      - name: Install Python dependencies createAccount
+        run: |
+          pip3 install -r ./backend/userService/createAccount/requirements.txt -t ./backend/userService/createAccount/
+
+        
+      - name: Zip create createAccount function
+        run: |
+          cd ./backend/userService/createAccount
+          zip -r ../../../infra/createAccount.zip .
+          cd -
+          
+      - name: Install Python dependencies deleteAccount
+        run: |
+          pip3 install -r ./backend/userService/deleteAccount/requirements.txt -t ./backend/userService/deleteAccount/
+        
+      - name: Zip create deleteAccount function
+        run: |
+          cd ./backend/userService/deleteAccount
+          zip -r ../../../infra/deleteAccount.zip .
+          cd -
+
+      - name: Install Python dependencies getAccount
+        run: |
+          pip3 install -r ./backend/userService/getAccount/requirements.txt -t ./backend/userService/getAccount/
+
+      - name: Zip create getAccount function
+        run: |
+          cd ./backend/userService/getAccount
+          zip -r ../../../infra/getAccount.zip .
+          cd -
+          
+      - name: Install Python dependencies updateAccount
+        run: |
+          pip3 install -r ./backend/userService/updateAccount/requirements.txt -t ./backend/userService/updateAccount/
+
+      - name: Zip create updateAccount function
+        run: |
+          cd ./backend/userService/updateAccount
+          zip -r ../../../infra/updateAccount.zip .
           cd -
 
       
