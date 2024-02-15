@@ -28,13 +28,13 @@ def test_edit_item_in_table(dynamodb_mock):
     table = dynamodb_mock.Table(table_name)
 
     mock_item = {
-        'lenderID': "Len Derr",
-        'itemName': "Eye Temm",
+        'lenderID': 'Len Derr',
+        'itemName': 'Eye Temm',
         'itemID': '69420',
-        'description': "a description",
+        'description': 'a description',
         'maxBorrowDays': 69,
-        'image': "url.com",
-        'imageHash': "HAHAHASH"
+        'image': 'url.com',
+        'imageHash': 'HAHAHASH'
     }
 
     table.put_item(Item=mock_item)
@@ -45,11 +45,11 @@ def test_edit_item_in_table(dynamodb_mock):
     print("Setup Item Valid")
 
     mock_update = {
-        'itemName': "aight \'em",
-        'description': "a new description",
+        'itemName': 'aight \'em',
+        'description': 'a new description',
         'maxBorrowDays': 420,
-        'image': "url2.com",
-        'imageHash': "hashbrown"
+        'image': 'url2.com',
+        'imageHash': 'hashbrown'
     }
 
     update = update_item_in_table(table, "69420", mock_update)
