@@ -54,7 +54,6 @@ def test_edit_item_in_table(dynamodb_mock):
     }
 
     update = update_item_in_table(table, mock_update)
-    print(update)
 
     assert update['ResponseMetadata']['HTTPStatusCode'] == 200
 
