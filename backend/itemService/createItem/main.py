@@ -19,20 +19,10 @@ def parse_event_body(event_body):
 
 def insert_item_in_table(table, itemID, data):
     """Insert an item into the DynamoDB table."""
-    item = {
-        'itemID': {'S': itemID},
-        'lenderID': {'N': data['lenderID']},
-        'itemName': {'S': data['itemName']},
-        'description': {'S': data['description']},
-        'maxBorrowDays': {'N': data['maxBorrowDays']},
-        'imageURL': {'S': data['image']},
-    }
-
+    
     response = table.put_item(
-        Key={
-            'itemID': itemID
-        },
-        Item=item
+        Item=data,
+        ReturnValues='ALL_OLD'
     )
     return response
 
@@ -99,24 +89,22 @@ def handler(event, context):
         # Create a unique item ID
         itemID = str(uuid.uuid4())
 
-        # Get a timestamp for the item creation
-        time = str(int(time.time()))
-
         raw_image = body['image']
         image_bytes = base64.b64decode(raw_image)
+        image_hash = hashlib.sha256(image_bytes).hexdigest()
         filename = "./tmp/img.png"
         with open(filename, "wb") as f:
             f.write(image_bytes)
 
         image_url = post_image(filename)["secure_url"]
 
-        data  = {
+        data = {
             'lenderID': lenderID,
             'itemName': itemName,
             'description': description,
             'maxBorrowDays': maxBorrowDays,
             'image': image_url,
-            'timestamp': time
+            'imageHash': image_hash
         }
 
         table_name = 'items-30144999'
@@ -133,7 +121,3 @@ def handler(event, context):
             'statusCode': 500,
             'body': json.dumps(str(e))
         }
-
-# test function
-def add(a, b):
-    return a + b
