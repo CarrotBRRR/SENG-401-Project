@@ -64,4 +64,3 @@ def test_edit_item_in_table(dynamodb_mock):
     assert response['Item']['maxBorrowDays'] == 420
     assert response['Item']['image'] == "url2.com"
     assert response['Item']['imageHash'] == "hashbrown"
-
