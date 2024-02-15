@@ -16,24 +16,14 @@ def parse_event_body(event_body):
         return json.loads(event_body)
     return event_body
 
-# This is probably wrong?
-def update_item_in_table(table, itemID, newInfo):
+def update_item_in_table(table, itemID, newData):
     """Update an item in the DynamoDB table."""
-    response = table.update_item(
-        Key={
-            'itemID': itemID
-        },
-        UpdateExpression="set itemName = :itemName, set description = :description, set maxBorrowDays = :maxBorrowDays, set imageURL = :imageURL, set imageHash = :imageHash",
-        ExpressionAttributeValues={
-            ':itemName': newInfo["itemName"],
-            ':description': newInfo["description"],
-            ':maxBorrowDays': newInfo["maxBorrowDays"],
-            ':imageURL': newInfo["image"],
-            ':imageHash': newInfo["imageHash"]
-        },
-        ReturnValues="UPDATED_NEW"
+    response = table.put_item(
+        Item=newData,
+        ReturnValues='ALL_OLD'
     )
     return response
+
 
 def post_image(image):
     # Get the credentials from AWS Parameter Store
