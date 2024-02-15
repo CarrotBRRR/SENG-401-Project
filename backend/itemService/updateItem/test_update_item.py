@@ -44,7 +44,9 @@ def test_edit_item_in_table(dynamodb_mock):
     assert setup_item['Item']['itemName'] == "Eye Temm"
 
     mock_update = {
+        'itemID': '69420',
         'itemName': 'aight \'em',
+        'lenderID': 'Len Derr',
         'description': 'a new description',
         'maxBorrowDays': 420,
         'image': 'url2.com',
