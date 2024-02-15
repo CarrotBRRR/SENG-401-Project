@@ -23,14 +23,13 @@ def update_item_in_table(table, itemID, newInfo):
         Key={
             'itemID': itemID
         },
-        UpdateExpression="set itemName = :itemName, set description = :description, \
-        set maxBorrowDays = :maxBorrowDays, set imageURL = :imageURL, set imageHash = :imageHash",
+        UpdateExpression="set itemName = :itemName, set description = :description, set maxBorrowDays = :maxBorrowDays, set imageURL = :imageURL, set imageHash = :imageHash",
         ExpressionAttributeValues={
             ':itemName': newInfo["itemName"],
             ':description': newInfo["description"],
             ':maxBorrowDays': newInfo["maxBorrowDays"],
-            ':imageURL': newInfo["image_url"],
-            ':imageHash': newInfo["image_hash"]
+            ':imageURL': newInfo["image"],
+            ':imageHash': newInfo["imageHash"]
         },
         ReturnValues="UPDATED_NEW"
     )
@@ -108,15 +107,15 @@ def handler(event, context):
             image_url = response["secure_url"]
             image_hash = new_image_hash
         else:
-            image_url = table.get_item(Key={"itemID": itemID})["Item"]["imageURL"]
+            image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
             image_hash = old_image_hash
 
         newInfo = {
             'itemName': itemName,
             'description': description,
             'maxBorrowDays': maxBorrowDays,
-            'image_url': image_url,
-            'image_hash': image_hash
+            'image': image_url,
+            'imageHash': image_hash
         }
 
         response = update_item_in_table(table, itemID, newInfo)
