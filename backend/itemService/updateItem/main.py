@@ -16,7 +16,7 @@ def parse_event_body(event_body):
         return json.loads(event_body)
     return event_body
 
-def update_item_in_table(table, itemID, newData):
+def update_item_in_table(table, newData):
     """Update an item in the DynamoDB table."""
     response = table.put_item(
         Item=newData,
@@ -82,6 +82,7 @@ def handler(event, context):
         body = parse_event_body(event["body"])
     
         itemID = body["itemID"]
+        lenderID = body['lenderID']
         itemName = body["name"]
         description = body["description"]
         maxBorrowDays = body["max_borrow_days"]
@@ -101,6 +102,7 @@ def handler(event, context):
 
         newInfo = {
             'itemID': itemID,
+            'lenderID': lenderID,
             'itemName': itemName,
             'description': description,
             'maxBorrowDays': maxBorrowDays,
@@ -108,7 +110,7 @@ def handler(event, context):
             'imageHash': image_hash
         }
 
-        response = update_item_in_table(table, itemID, newInfo)
+        response = update_item_in_table(table, newInfo)
         
         return {
             'statusCode': 200,

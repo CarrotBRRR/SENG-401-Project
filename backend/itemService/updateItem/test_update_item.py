@@ -42,7 +42,6 @@ def test_edit_item_in_table(dynamodb_mock):
     setup_item = table.get_item(Key={'itemID': '69420'})
 
     assert setup_item['Item']['itemName'] == "Eye Temm"
-    print("Setup Item Valid")
 
     mock_update = {
         'itemName': 'aight \'em',
@@ -52,7 +51,7 @@ def test_edit_item_in_table(dynamodb_mock):
         'imageHash': 'hashbrown'
     }
 
-    update = update_item_in_table(table, "69420", mock_update)
+    update = update_item_in_table(table, mock_update)
     print(update)
 
     assert update['ResponseMetadata']['HTTPStatusCode'] == 200
