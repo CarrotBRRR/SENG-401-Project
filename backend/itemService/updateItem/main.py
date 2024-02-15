@@ -24,7 +24,6 @@ def update_item_in_table(table, itemID, newData):
     )
     return response
 
-
 def post_image(image):
     # Get the credentials from AWS Parameter Store
     ssm = boto3.client('ssm')
@@ -101,6 +100,7 @@ def handler(event, context):
             image_hash = old_image_hash
 
         newInfo = {
+            'itemID': itemID,
             'itemName': itemName,
             'description': description,
             'maxBorrowDays': maxBorrowDays,
