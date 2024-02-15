@@ -17,9 +17,8 @@ def parse_event_body(event_body):
         return json.loads(event_body)
     return event_body
 
-def insert_item_in_table(table, itemID, data):
+def insert_item_in_table(table, data):
     """Insert an item into the DynamoDB table."""
-    
     response = table.put_item(
         Item=data,
         ReturnValues='ALL_OLD'
@@ -99,6 +98,7 @@ def handler(event, context):
         image_url = post_image(filename)["secure_url"]
 
         data = {
+            'itemID': itemID,
             'lenderID': lenderID,
             'itemName': itemName,
             'description': description,
@@ -109,7 +109,7 @@ def handler(event, context):
 
         table_name = 'items-30144999'
         table = get_dynamodb_table(table_name)
-        response = insert_item_in_table(table, itemID, data)
+        response = insert_item_in_table(table, data)
 
         return {
             'statusCode': 200,

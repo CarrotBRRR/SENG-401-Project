@@ -38,7 +38,7 @@ def test_insert_item_in_table(dynamodb_mock):
         'imageHash': "HAHAHASH"
     }
 
-    insertion = insert_item_in_table(table, "69420", mock_item)
+    insertion = insert_item_in_table(table, mock_item)
 
     response = table.get_item(Key={'itemID': '69420'})
 
