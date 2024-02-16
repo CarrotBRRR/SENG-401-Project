@@ -77,20 +77,26 @@ def create_query_string(dict):
 
 def handler(event, context):
     try:
+        # Get the table and retrieve the old values
         table_name = 'items-30144999'
         table = get_dynamodb_table(table_name)
+        old_image_hash = table.get_item(Key={"itemID": itemID})["Item"]["imageHash"]
+        timestamp = table.get_item(Key={"itemID": itemID})["Item"]["timestamp"]
+
+        # Parse the event body
         body = parse_event_body(event["body"])
-    
         itemID = body["itemID"]
+
+        # Get the new values
         lenderID = body['lenderID']
         itemName = body["name"]
         description = body["description"]
         maxBorrowDays = body["max_borrow_days"]
 
+        # Handle the new image
         raw_image = body["image"]
         image_bytes = base64.b64decode(raw_image)
         new_image_hash = hashlib.sha256(image_bytes).hexdigest()
-        old_image_hash = table.get_item(Key={"itemID": itemID})["Item"]["imageHash"]
         
         if(new_image_hash != old_image_hash):
             response = post_image(image_bytes)
@@ -107,7 +113,8 @@ def handler(event, context):
             'description': description,
             'maxBorrowDays': maxBorrowDays,
             'image': image_url,
-            'imageHash': image_hash
+            'imageHash': image_hash,
+            'timestamp': timestamp
         }
 
         response = update_item_in_table(table, newInfo)
