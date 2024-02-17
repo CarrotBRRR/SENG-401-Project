@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Button,
   Dropdown,
   DropdownDivider,
   DropdownHeader,
@@ -26,7 +27,7 @@ export default function Header() {
           ToolShed
         </span>
       </NavbarBrand>
-      <div className="flex md:order-2">
+      <div className="flex md:order-2 gap-4">
         <Dropdown
           arrowIcon={false}
           inline
@@ -50,6 +51,8 @@ export default function Header() {
           <DropdownDivider />
           <DropdownItem>Sign out</DropdownItem>
         </Dropdown>
+        <Button className=" bg-brand">List Items</Button>
+
         <NavbarToggle />
       </div>
       <NavbarCollapse>
