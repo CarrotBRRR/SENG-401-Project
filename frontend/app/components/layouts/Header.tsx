@@ -11,6 +11,10 @@ import {
   NavbarLink,
   NavbarToggle,
 } from "flowbite-react";
+import { Label, TextInput } from "flowbite-react";
+import { FaLocationDot } from "react-icons/fa6";
+
+import { FaSearch } from "react-icons/fa";
 import Image from "next/image";
 export default function Header() {
   return (
@@ -29,7 +33,6 @@ export default function Header() {
       </NavbarBrand>
       <div className="flex md:order-2 gap-4">
         <Dropdown
-          arrowIcon={false}
           inline
           label={
             <Avatar
@@ -45,9 +48,10 @@ export default function Header() {
               name@flowbite.com
             </span>
           </DropdownHeader>
-          <DropdownItem>Dashboard</DropdownItem>
-          <DropdownItem>Settings</DropdownItem>
-          <DropdownItem>Earnings</DropdownItem>
+          <DropdownItem>My Profile</DropdownItem>
+          <DropdownItem>Requested Tools</DropdownItem>
+          <DropdownItem>Active Listings</DropdownItem>
+          <DropdownItem>Disputes</DropdownItem>
           <DropdownDivider />
           <DropdownItem>Sign out</DropdownItem>
         </Dropdown>
@@ -55,15 +59,28 @@ export default function Header() {
 
         <NavbarToggle />
       </div>
-      <NavbarCollapse>
-        <NavbarLink href="#" active>
-          Home
-        </NavbarLink>
-        <NavbarLink href="#">About</NavbarLink>
-        <NavbarLink href="#">Services</NavbarLink>
-        <NavbarLink href="#">Pricing</NavbarLink>
-        <NavbarLink href="#">Contact</NavbarLink>
-      </NavbarCollapse>
+      <div className="flex gap-4 place-items-center">
+        <TextInput
+          type="text"
+          icon={FaSearch}
+          placeholder="What are you looking for?"
+        />
+
+        <Dropdown inline label="All categories">
+          <DropdownItem>Hand Tools</DropdownItem>{" "}
+          <DropdownItem>Power Tools</DropdownItem>{" "}
+          <DropdownItem>Outdoor & Garden</DropdownItem>{" "}
+          <DropdownItem>Hammers</DropdownItem>
+          <DropdownItem>Sports</DropdownItem>
+        </Dropdown>
+        <div className=" flex flex-row place-items-center gap-2">
+          <div className="rounded-full opacity-80 p-2 bg-brand">
+            <FaLocationDot></FaLocationDot>
+          </div>
+
+          <div className=" text-sm">Calgary, Alberta</div>
+        </div>
+      </div>
     </Navbar>
   );
 }
