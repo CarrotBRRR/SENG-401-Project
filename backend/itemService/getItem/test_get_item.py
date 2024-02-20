@@ -45,7 +45,7 @@ def test_handler_with_lastItemID(dynamodb_mock, items_table):
     items_table.put_item(Item={'itemID': '1'})
     items_table.put_item(Item={'itemID': '2'})
     event = {
-        'body': json.dumps({'lastItemID': '1', 'pagecount': 1})
+        'headers': {'lastItemID': '1', 'pagecount': 1}
     }
     response = handler(event, None)
     assert response['statusCode'] == 200
@@ -57,7 +57,7 @@ def test_handler_no_lastItemID(dynamodb_mock, items_table):
     items_table.put_item(Item={'itemID': '1'})
     items_table.put_item(Item={'itemID': '2'})
     event = {
-        'body': json.dumps({'pagecount': 2})
+        'headers': {'pagecount': 2}
     }
     response = handler(event, None)
     assert response['statusCode'] == 200

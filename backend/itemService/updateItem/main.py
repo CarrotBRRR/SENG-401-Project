@@ -89,6 +89,7 @@ def handler(event, context):
 
         # Get the new values
         lenderID = body['lenderID']
+        lenderID = body['lenderID']
         itemName = body["name"]
         description = body["description"]
         maxBorrowDays = body["max_borrow_days"]
@@ -104,9 +105,12 @@ def handler(event, context):
             image_hash = new_image_hash
         else:
             image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
+            image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
             image_hash = old_image_hash
 
         newInfo = {
+            'itemID': itemID,
+            'lenderID': lenderID,
             'itemID': itemID,
             'lenderID': lenderID,
             'itemName': itemName,
@@ -115,8 +119,11 @@ def handler(event, context):
             'image': image_url,
             'imageHash': image_hash,
             'timestamp': timestamp
+            'image': image_url,
+            'imageHash': image_hash
         }
 
+        response = update_item_in_table(table, newInfo)
         response = update_item_in_table(table, newInfo)
         
         return {
