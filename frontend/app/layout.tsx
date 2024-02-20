@@ -7,6 +7,8 @@ import Header from "./components/layouts/Header";
 import Footer from "./components/layouts/Footer";
 import { CustomFlowbiteTheme, Flowbite } from "flowbite-react";
 import customTheme from "./flowBiteTheme";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +30,7 @@ export default function RootLayout({
             <Header></Header>
             <ThemeSwitcher />
             {children}
+            <ToastContainer></ToastContainer>
             <Footer></Footer>
           </ThemeProvider>
         </Flowbite>
