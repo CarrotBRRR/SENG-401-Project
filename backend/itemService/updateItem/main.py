@@ -99,6 +99,7 @@ def handler(event, context):
         image_bytes = base64.b64decode(raw_image)
         new_image_hash = hashlib.sha256(image_bytes).hexdigest()
         
+        # If the image has changed, upload it to Cloudinary, and update the image URL and hash
         if(new_image_hash != old_image_hash):
             response = post_image(image_bytes)
             image_url = response["secure_url"]
@@ -108,9 +109,8 @@ def handler(event, context):
             image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
             image_hash = old_image_hash
 
+        # Create a new item object
         newInfo = {
-            'itemID': itemID,
-            'lenderID': lenderID,
             'itemID': itemID,
             'lenderID': lenderID,
             'itemName': itemName,
@@ -119,11 +119,9 @@ def handler(event, context):
             'image': image_url,
             'imageHash': image_hash,
             'timestamp': timestamp
-            'image': image_url,
-            'imageHash': image_hash
         }
 
-        response = update_item_in_table(table, newInfo)
+        # Update the item in the table
         response = update_item_in_table(table, newInfo)
         
         return {
