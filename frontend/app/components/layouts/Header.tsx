@@ -31,7 +31,29 @@ export default function Header() {
           ToolShed
         </span>
       </NavbarBrand>
-      <div className="flex md:order-2 gap-4">
+
+      <div className="flex order-2 md:order-none gap-4 place-items-center justify-center items-center">
+        <TextInput
+          type="text"
+          icon={FaSearch}
+          placeholder="What are you looking for?"
+        />
+
+        <Dropdown inline label="All categories">
+          <DropdownItem>Hand Tools</DropdownItem>{" "}
+          <DropdownItem>Power Tools</DropdownItem>{" "}
+          <DropdownItem>Outdoor & Garden</DropdownItem>{" "}
+          <DropdownItem>Hammers</DropdownItem>
+          <DropdownItem>Sports</DropdownItem>
+        </Dropdown>
+        <div className="hidden sm:flex flex-row place-items-center gap-2 ">
+          <div className="rounded-full opacity-80 p-2 bg-brand">
+            <FaLocationDot></FaLocationDot>
+          </div>
+          <div className=" text-sm">Calgary, Alberta</div>
+        </div>
+      </div>
+      <div className="flex  gap-4">
         <Dropdown
           inline
           label={
@@ -56,30 +78,6 @@ export default function Header() {
           <DropdownItem>Sign out</DropdownItem>
         </Dropdown>
         <Button className=" bg-brand">List Items</Button>
-
-        <NavbarToggle />
-      </div>
-      <div className="flex gap-4 place-items-center">
-        <TextInput
-          type="text"
-          icon={FaSearch}
-          placeholder="What are you looking for?"
-        />
-
-        <Dropdown inline label="All categories">
-          <DropdownItem>Hand Tools</DropdownItem>{" "}
-          <DropdownItem>Power Tools</DropdownItem>{" "}
-          <DropdownItem>Outdoor & Garden</DropdownItem>{" "}
-          <DropdownItem>Hammers</DropdownItem>
-          <DropdownItem>Sports</DropdownItem>
-        </Dropdown>
-        <div className=" flex flex-row place-items-center gap-2">
-          <div className="rounded-full opacity-80 p-2 bg-brand">
-            <FaLocationDot></FaLocationDot>
-          </div>
-
-          <div className=" text-sm">Calgary, Alberta</div>
-        </div>
       </div>
     </Navbar>
   );
