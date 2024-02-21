@@ -18,9 +18,9 @@ export default function ListingMedia() {
         <h3 className="text-brand font-medium ">
           You can upload a maximum of 8 photos that are at least 300px wide or
           tall (we recommend at least 1000px.)
-        </h3>{" "}
+        </h3>
         <h3 className="text-brand font-medium ">
-          Drag and drop to change the order of your pictures.
+          Click on a frame to upload an image.
         </h3>
       </div>
       <UploadImageComponent></UploadImageComponent>
