@@ -77,7 +77,7 @@ export default function Header() {
           <DropdownDivider />
           <DropdownItem>Sign out</DropdownItem>
         </Dropdown>
-        <Button className=" bg-brand">List Items</Button>
+        <Button color="primary">List Items</Button>
       </div>
     </Navbar>
   );

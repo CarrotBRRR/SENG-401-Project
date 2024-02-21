@@ -2,8 +2,9 @@ import { CustomFlowbiteTheme } from "flowbite-react";
 
 const customTheme: CustomFlowbiteTheme = {
   button: {
+    base: "bg-brand hover:opacity-90 text-white",
     color: {
-      primary: " bg-brand hover:bg-red-600",
+      primary: "bg-brand hover:opacity-90",
     },
   },
   datepicker: {

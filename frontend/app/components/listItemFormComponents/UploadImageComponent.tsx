@@ -57,7 +57,11 @@ export default function UploadImageComponent() {
             }}
           />
         </label>
-        <Button className="w-full h-12" onClick={() => handleRemoveTag(index)}>
+        <Button
+          color={"primary"}
+          className="w-full h-12 flex place-content-center justify-center items-center"
+          onClick={() => handleRemoveTag(index)}
+        >
           {file === "/missingImage.jpg" ? "" : <FaTimes />}
         </Button>
       </div>
