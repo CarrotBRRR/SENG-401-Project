@@ -97,7 +97,11 @@ export default function ListingDetails() {
         </div>
 
         <div className="flex flex-row gap-4">
-          <Button onClick={handleAddTag} className="flex-nowrap text-nowrap">
+          <Button
+            color={"primary"}
+            onClick={handleAddTag}
+            className="flex-nowrap text-nowrap"
+          >
             Add tag
           </Button>
 
@@ -115,7 +119,9 @@ export default function ListingDetails() {
           </ul>
         </div>
       </div>
-      <Button type="submit">Submit</Button>
+      <Button color={"primary"} type="submit">
+        Submit
+      </Button>
     </form>
   );
 }

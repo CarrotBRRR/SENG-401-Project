@@ -2,6 +2,7 @@ import React from "react";
 import ListingDetails from "./listItemFormComponents/ListingDetails";
 import ListingMedia from "./listItemFormComponents/ListingMedia";
 import ListingLocation from "./listItemFormComponents/ListingLocation";
+import ListingContactInformation from "./listItemFormComponents/ListingContactInformation";
 
 export default function ListItemForm() {
   return (
@@ -9,6 +10,7 @@ export default function ListItemForm() {
       <ListingDetails></ListingDetails>
       <ListingMedia></ListingMedia>
       <ListingLocation></ListingLocation>
+      <ListingContactInformation></ListingContactInformation>
     </div>
   );
 }
