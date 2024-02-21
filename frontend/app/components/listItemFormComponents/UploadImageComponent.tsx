@@ -31,7 +31,6 @@ export default function UploadImageComponent() {
     index: number;
     file: string;
   }) => {
-    console.log(index, file);
     return (
       <div className="w-44 border rounded hover:opacity-90 cursor-pointer">
         <label
@@ -70,7 +69,6 @@ export default function UploadImageComponent() {
   return (
     <div className="flex flex-row flex-wrap gap-2">
       {images.map((image, index) => {
-        console.log(image);
         return (
           <MediaImage
             key={index}

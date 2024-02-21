@@ -1,6 +1,7 @@
 import React from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import ListingMapContainer from "./ListingMapContainer";
+import { Tooltip } from "flowbite-react";
 
 export default function ListingLocation() {
   const city = "Calgary";
@@ -37,9 +38,11 @@ export default function ListingLocation() {
             <h3 className="text-brand font-medium ">
               Not the city you want to post in?
             </h3>
-            <div className="size-8 flex justify-center items-center place-items-center bg-neutral-200  rounded-full">
-              <p className="text-black dark:text-white"> ?</p>
-            </div>
+            <Tooltip content="You can change your default location in the 'Settings' tab">
+              <div className="size-8 flex justify-center items-center place-items-center bg-neutral-200  rounded-full">
+                <p className="text-black dark:text-white"> ?</p>
+              </div>
+            </Tooltip>
           </div>
         </div>
       </div>
