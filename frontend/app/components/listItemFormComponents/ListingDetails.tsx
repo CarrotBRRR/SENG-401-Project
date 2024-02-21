@@ -31,7 +31,7 @@ export default function ListingDetails() {
 
   return (
     <form
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-4 border p-4 rounded shadow"
       onSubmit={(e) => {
         e.preventDefault();
         notify();
