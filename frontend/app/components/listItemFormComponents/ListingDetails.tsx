@@ -1,12 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Button, Select, Label, TextInput, Textarea } from "flowbite-react";
-import { toast } from "react-toastify";
 import { FaSearch } from "react-icons/fa";
-import {
-  functionThatReturnPromiseFail,
-  functionThatReturnPromise,
-} from "@/app/utils/mockPromise";
 export default function ListingDetails() {
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState<string>("");
@@ -22,33 +17,21 @@ export default function ListingDetails() {
       prevTags.filter((_, index) => index !== indexToRemove)
     );
   };
-  const notify = () =>
-    toast.promise(functionThatReturnPromise, {
-      pending: "Listing is being uploaded...",
-      success: "Listing has been posted",
-      error: "Listing rejected. Please try again later.",
-    });
 
   return (
-    <form
-      className="flex flex-col gap-4 border p-4 rounded shadow"
-      onSubmit={(e) => {
-        e.preventDefault();
-        notify();
-      }}
-    >
+    <div className="flex flex-col gap-4 border p-4 rounded shadow justify-between">
       <div className=" flex flex-row place-items-center gap-4">
         <div className=" rounded-lg bg-gray-200 p-2 size-8 justify-center items-center flex">
           1
         </div>
         <div className=" text-xl font-medium text-black ">Listing Details</div>
       </div>
-      <div className=" inline-flex flex-row justify-start items-center gap-2.5 whitespace-nowrap text-sm">
-        <button className="text-brand font-medium ">Select Category:</button>
-        <button className="text-brand font-bold ">
+      <div className=" inline-flex flex-row justify-start items-center gap-2.5 whitespace-nowrap text-sm cursor-pointer">
+        <p className="text-brand font-medium">Select Category:</p>
+        <p className="text-brand font-bold ">
           Buy and Sell {">"} Sporting Goods & Exercise {">"} Ski
-        </button>
-        <button className="text-blue-500 font-bold ">Change category</button>
+        </p>
+        <p className="text-blue-500 font-bold ">Change category</p>
       </div>
 
       <div>
@@ -119,9 +102,6 @@ export default function ListingDetails() {
           </ul>
         </div>
       </div>
-      <Button color={"primary"} type="submit">
-        Submit
-      </Button>
-    </form>
+    </div>
   );
 }
