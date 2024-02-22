@@ -5,10 +5,12 @@ import "./globals.css";
 import { ThemeSwitcher } from "./components/ThemeSwitcher";
 import Header from "./components/layouts/Header";
 import Footer from "./components/layouts/Footer";
-import { CustomFlowbiteTheme, Flowbite } from "flowbite-react";
+import { Flowbite } from "flowbite-react";
 import customTheme from "./flowBiteTheme";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTheme } from "next-themes";
+import ToastComponent from "./components/ToastComponent";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,7 +32,7 @@ export default function RootLayout({
             <Header></Header>
             <ThemeSwitcher />
             {children}
-            <ToastContainer></ToastContainer>
+            <ToastComponent></ToastComponent>
             <Footer></Footer>
           </ThemeProvider>
         </Flowbite>
