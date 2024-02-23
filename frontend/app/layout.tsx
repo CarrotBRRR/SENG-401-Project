@@ -5,7 +5,12 @@ import "./globals.css";
 import { ThemeSwitcher } from "./components/ThemeSwitcher";
 import Header from "./components/layouts/Header";
 import Footer from "./components/layouts/Footer";
-import { CustomFlowbiteTheme, Flowbite } from "flowbite-react";
+import { Flowbite } from "flowbite-react";
+import customTheme from "./flowBiteTheme";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useTheme } from "next-themes";
+import ToastComponent from "./components/ToastComponent";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,32 +18,7 @@ export const metadata: Metadata = {
   title: "ToolShed",
   description: "The tool lending platform",
 };
-const customTheme: CustomFlowbiteTheme = {
-  button: {
-    color: {
-      primary: " bg-brand hover:bg-red-600",
-    },
-  },
-  datepicker: {
-    popup: {
-      footer: {
-        button: {
-          today: "bg-brand text-white hover:opacity-90",
-        },
-      },
-    },
-    views: {
-      days: {
-        items: {
-          item: {
-            selected:
-              "dark:text-white dark:hover:bg-gray-600 bg-brand text-white hover:bg-brand-lighter",
-          },
-        },
-      },
-    },
-  },
-};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -52,6 +32,7 @@ export default function RootLayout({
             <Header></Header>
             <ThemeSwitcher />
             {children}
+            <ToastComponent></ToastComponent>
             <Footer></Footer>
           </ThemeProvider>
         </Flowbite>

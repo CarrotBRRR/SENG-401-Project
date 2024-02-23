@@ -29,8 +29,8 @@ def handler(event, context):
     try:
         headers = event.get("headers", {})
         
-        last_itemID = headers.get('lastItemID', '')
-        pageCount = headers.get('pagecount', 'failTest')
+        last_itemID = headers.get('lastitemid', '')
+        pageCount = headers.get('pagecount', '10')
         pageCount = int(pageCount) 
         table_name = 'items-30144999'
         

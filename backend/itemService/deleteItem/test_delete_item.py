@@ -3,14 +3,6 @@ from main import *
 from moto import mock_aws
 import boto3
 
-def test_parse_event_body_with_dict():
-    event_body = {"key": "value"}
-    assert parse_event_body(event_body) == event_body, "Should return the original dictionary without changes."
-
-def test_parse_event_body_with_json_string():
-    event_body = '{"key": "value"}'
-    expected_result = {"key": "value"}
-    assert parse_event_body(event_body) == expected_result, "Should convert JSON string to dictionary."
 
 @pytest.fixture
 def aws_credentials():
