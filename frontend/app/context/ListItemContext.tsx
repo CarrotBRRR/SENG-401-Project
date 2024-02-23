@@ -1,3 +1,4 @@
+"use client";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { ListItemI, Condition } from "../interfaces/ListItemI";
 
@@ -32,7 +33,7 @@ export function useListItem() {
 // Provider component
 export function ListItemProvider({ children }: { children: ReactNode }) {
   const [title, setTitle] = useState<string>("");
-  const [condition, setCondition] = useState<Condition>(Condition.New);
+  const [condition, setCondition] = useState<Condition>(Condition.UsedLikeNew);
   const [description, setDescription] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
   const [images, setImages] = useState<(File | undefined)[]>(
