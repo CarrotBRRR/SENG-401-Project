@@ -43,10 +43,13 @@ def test_remove_borrowerID_from_item(dynamodb_table):
     dynamodb_table.put_item(Item={'itemID': itemID, 'borrowerID': '12345'})
 
     # Perform the remove operation
-    remove_borrowerID_from_item(dynamodb_table, itemID)
+    update_borrowerID_to_null_in_item(dynamodb_table, itemID)
 
     # Fetch the updated item
     response = dynamodb_table.get_item(Key={'itemID': itemID})
     assert 'Item' in response
-    assert 'borrowerID' not in response['Item'], "borrowerID should be removed from the item"
+    item = response['Item']
+    # Assert that the borrowerID is now null for itemID 1
+    assert item['borrowerID'] is None
+
 
