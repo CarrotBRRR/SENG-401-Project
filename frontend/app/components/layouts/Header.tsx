@@ -6,13 +6,13 @@ import {
   DropdownHeader,
   DropdownItem,
   Navbar,
-  NavbarBrand,
 } from "flowbite-react";
 import { TextInput } from "flowbite-react";
 import { FaLocationDot } from "react-icons/fa6";
 
 import { FaSearch } from "react-icons/fa";
 import Image from "next/image";
+import Link from "next/link";
 export default function Header() {
   const dropdownOptions = [
     "Hand Tools",
@@ -23,7 +23,7 @@ export default function Header() {
   ];
   return (
     <Navbar fluid rounded>
-      <NavbarBrand href="/">
+      <Link href="/" className="flex flex-row">
         <Image
           height={36}
           width={36}
@@ -34,7 +34,7 @@ export default function Header() {
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
           ToolShed
         </span>
-      </NavbarBrand>
+      </Link>
 
       <div className="flex order-2 md:order-none gap-4 place-items-center justify-center items-center">
         <TextInput
@@ -79,7 +79,9 @@ export default function Header() {
           <DropdownDivider />
           <DropdownItem>Sign out</DropdownItem>
         </Dropdown>
-        <Button color="primary">List Items</Button>
+        <Link href="/upload">
+          <Button color="primary">List Items</Button>
+        </Link>
       </div>
     </Navbar>
   );
