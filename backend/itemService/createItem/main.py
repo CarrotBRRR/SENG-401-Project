@@ -96,14 +96,22 @@ def handler(event, context):
         itemID = str(uuid.uuid4())
 
         # Image handling
-        raw_image = body['image']
-        image_bytes = base64.b64decode(raw_image)
-        image_hash = hashlib.sha256(image_bytes).hexdigest()
-        filename = "./tmp/img.png"
-        with open(filename, "wb") as f:
-            f.write(image_bytes)
+        raw_images = body['images']
+        image_urls = []
+        image_hashes = []
+        for raw_image in raw_images:
+            # Decode the image and hash it
+            image_bytes = base64.b64decode(raw_image)
+            image_hash = hashlib.sha256(image_bytes).hexdigest()
 
-        image_url = post_image(filename)["secure_url"]
+            # Save the image to a temp file
+            filename = "./tmp/img.png"
+            with open(filename, "wb") as f:
+                f.write(image_bytes)
+
+            # Upload the image to Cloudinary
+            image_urls.append(post_image(filename)["secure_url"])
+            image_hashes.append(image_hash)
 
         # Get the current time
         time = str(int(time.time()))
@@ -115,8 +123,8 @@ def handler(event, context):
             'itemName': itemName,
             'description': description,
             'maxBorrowDays': maxBorrowDays,
-            'image': image_url,
-            'imageHash': image_hash,
+            'image': image_urls,
+            'imageHash': image_hashes,
             'timestamp': time,
             'borrowerID': None
         }

@@ -34,8 +34,8 @@ def test_insert_item_in_table(dynamodb_mock):
         'itemID': '69420',
         'description': "a description",
         'maxBorrowDays': 69,
-        'image': "url.com",
-        'imageHash': "HAHAHASH"
+        'image': ["url.com", 'anotherurl.com'],
+        'imageHash': ["HAHAHASH", "anotherHAHAsh"]
     }
 
     insertion = insert_item_in_table(table, mock_item)
@@ -50,6 +50,6 @@ def test_insert_item_in_table(dynamodb_mock):
     assert response['Item']['itemName'] == 'Eye Temm'
     assert response['Item']['description'] == 'a description'
     assert response['Item']['maxBorrowDays'] == 69
-    assert response['Item']['image'] == 'url.com'
-    assert response['Item']['imageHash'] == 'HAHAHASH'
+    assert response['Item']['image'] == ["url.com", 'anotherurl.com']
+    assert response['Item']['imageHash'] == ["HAHAHASH", "anotherHAHAsh"]
 

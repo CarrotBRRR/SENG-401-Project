@@ -80,7 +80,7 @@ def handler(event, context):
         # Get the table and retrieve the old values
         table_name = 'items-30144999'
         table = get_dynamodb_table(table_name)
-        old_image_hash = table.get_item(Key={"itemID": itemID})["Item"]["imageHash"]
+        old_image_hashes = table.get_item(Key={"itemID": itemID})["Item"]["imageHashes"]
         timestamp = table.get_item(Key={"itemID": itemID})["Item"]["timestamp"]
 
         # Parse the event body
@@ -94,20 +94,30 @@ def handler(event, context):
         description = body["description"]
         maxBorrowDays = body["max_borrow_days"]
 
-        # Handle the new image
-        raw_image = body["image"]
-        image_bytes = base64.b64decode(raw_image)
-        new_image_hash = hashlib.sha256(image_bytes).hexdigest()
-        
-        # If the image has changed, upload it to Cloudinary, and update the image URL and hash
-        if(new_image_hash != old_image_hash):
-            response = post_image(image_bytes)
-            image_url = response["secure_url"]
-            image_hash = new_image_hash
-        else:
-            image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
-            image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
-            image_hash = old_image_hash
+        # Get the image and hashes
+        raw_images = body["images"]
+        image_urls = []
+        image_hashes = []
+        for raw_image in raw_images:
+            image_bytes = base64.b64decode(raw_image)
+            new_image_hash = hashlib.sha256(image_bytes).hexdigest()
+            
+            # If the image has changed, upload it to Cloudinary, and update the image URL and hash
+            if new_image_hash not in old_image_hashes:
+                response = post_image(image_bytes)
+                image_url = response["secure_url"]
+                image_hash = new_image_hash
+                
+            # If the image has not changed, use the old image URL and hash
+            else:
+                image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
+                image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
+
+                i = old_image_hashes.index(new_image_hash)
+                image_hash = old_image_hashes[i]
+
+            image_urls.append(image_url)
+            image_hashes.append(image_hash)
 
         # Create a new item object
         newInfo = {
