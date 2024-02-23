@@ -8,11 +8,6 @@ def get_dynamodb_table(table_name):
     table = dynamodb.Table(table_name)
     return table
 
-def parse_event_body(event_body):
-    """Parse the event body, converting from JSON string to dictionary if necessary."""
-    if isinstance(event_body, str):
-        return json.loads(event_body)
-    return event_body
 
 def remove_item(table, itemID):
     """Remove an item from the DynamoDB table."""
@@ -27,8 +22,8 @@ def handler(event, context):
     try:
         table_name = 'items-30144999'
         table = get_dynamodb_table(table_name)
-        body = parse_event_body(event["body"])
-        itemID = body["itemID"]
+        headers = event.get("headers", {})
+        itemID = headers.get("itemID", {})
         
         response = remove_item(table, itemID)
         
