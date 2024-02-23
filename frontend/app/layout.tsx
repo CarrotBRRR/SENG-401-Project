@@ -31,7 +31,9 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <Header></Header>
             <ThemeSwitcher />
-            {children}
+            <div className="flex min-h-screen flex-col items-center justify-between p-24">
+              {children}
+            </div>
             <ToastComponent></ToastComponent>
             <Footer></Footer>
           </ThemeProvider>

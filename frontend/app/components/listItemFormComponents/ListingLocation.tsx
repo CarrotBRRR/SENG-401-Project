@@ -47,7 +47,12 @@ export default function ListingLocation() {
         </div>
       </div>
       <ListingMapContainer></ListingMapContainer>
-      <input className="hidden" name="location" value={location}></input>
+      <input
+        className="hidden"
+        name="location"
+        value={location}
+        readOnly
+      ></input>
     </div>
   );
 }

@@ -85,7 +85,12 @@ export default function ListingDetails() {
             helperText="Tag must be between 2-20 characters"
           />
         </div>
-        <input className="hidden" name="tags" value={JSON.stringify(tags)} />
+        <input
+          className="hidden"
+          name="tags"
+          value={JSON.stringify(tags)}
+          readOnly
+        />
 
         <div className="flex flex-row gap-4">
           <Button

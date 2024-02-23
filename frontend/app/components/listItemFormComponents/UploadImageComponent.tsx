@@ -80,6 +80,7 @@ export default function UploadImageComponent() {
       <input
         className="hidden"
         name="imageURLs"
+        readOnly
         value={JSON.stringify(imageURLs)}
       />
       {images.map((image, index) => {
