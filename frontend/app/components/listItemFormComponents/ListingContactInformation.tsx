@@ -1,12 +1,7 @@
-"use client";
 import { Label, TextInput } from "flowbite-react";
-import React, { useState } from "react";
 import { FaPhone, FaInbox } from "react-icons/fa";
 
 export default function ListingContactInformation() {
-  const [phoneNum, setPhoneNum] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-
   return (
     <div className="flex flex-col gap-4 border p-4 rounded shadow justify-between">
       <div className=" flex flex-row place-items-center gap-4">
@@ -23,9 +18,8 @@ export default function ListingContactInformation() {
         </div>
         <div className=" mb-2 block">
           <TextInput
-            onChange={(e) => setPhoneNum(e.target.value)}
-            value={phoneNum}
             id="phoneNumber"
+            name="phoneNumber"
             icon={FaPhone}
             placeholder="123 456 7890"
             maxLength={11}
@@ -40,13 +34,12 @@ export default function ListingContactInformation() {
         <div className=" mb-2 block">
           <TextInput
             type="email"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
             id="email"
+            name="email"
             icon={FaInbox}
             placeholder="john.doe@email.com"
             minLength={8}
-            maxLength={30}
+            maxLength={50}
             helperText="Your email will show up on your listing"
           />
         </div>

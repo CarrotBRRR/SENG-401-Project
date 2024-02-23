@@ -2,14 +2,23 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "flowbite-react";
-import { FaTimes, FaUpload } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
 
 export default function UploadImageComponent() {
   const [images, setImages] = useState<(File | undefined)[]>(
     Array.from({ length: 8 })
   );
+  const [imageURLs, setImageURLs] = useState<string[]>(
+    Array.from({ length: 8 })
+  );
   const handleAddTag = (newImage: File, index: number) => {
     if (index >= 8) return;
+    // upload to cloudinary...
+    setImageURLs((prevURLs) => {
+      const updatedURLs = [...prevURLs];
+      updatedURLs[index] = URL.createObjectURL(newImage);
+      return updatedURLs;
+    });
     setImages((prevImages) => {
       const updatedImages = [...prevImages];
       updatedImages[index] = newImage;
@@ -68,6 +77,11 @@ export default function UploadImageComponent() {
   };
   return (
     <div className="flex flex-row flex-wrap gap-2">
+      <input
+        className="hidden"
+        name="imageURLs"
+        value={JSON.stringify(imageURLs)}
+      />
       {images.map((image, index) => {
         return (
           <MediaImage
