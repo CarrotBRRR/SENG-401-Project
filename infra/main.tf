@@ -111,11 +111,23 @@ resource "aws_dynamodb_table" "items_dynamodb_table" {
   write_capacity = 1
 
   hash_key = "itemID"
+  range_key = "timestamp"  # Sort key
 
-  # the hash_key data type is string
   attribute {
     name = "itemID"
     type = "S"
+  }
+  attribute {
+    name = "timestamp"
+    type = "N"
+  }
+  global_secondary_index {
+    name               = "TimestampIndex"
+    hash_key           = "timestamp"
+    range_key          = "itemID"
+    projection_type    = "ALL"
+    read_capacity      = 1
+    write_capacity     = 1
   }
 
 }
