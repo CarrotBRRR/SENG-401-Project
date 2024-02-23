@@ -13,28 +13,34 @@ def parse_event_body(event_body):
         return json.loads(event_body)
     return event_body
 
-def fetch_items_after_itemID(table_name, last_itemID, pageCount):
+def fetch_items_from_timestamp(table_name, start_timestamp, pageCount):
     table = get_dynamodb_table(table_name)
-    scan_kwargs = {
-        'Limit': pageCount
+    query_kwargs = {
+        # Adjusted to query items with a timestamp less than the provided start_timestamp
+        'KeyConditionExpression': '#ts < :start_ts',
+        'ExpressionAttributeNames': {'#ts': 'timestamp'},
+        'ExpressionAttributeValues': {':start_ts': {'N': str(start_timestamp)}},
+        'Limit': pageCount,
+        'ScanIndexForward': False  # Ensures items are fetched from newest to oldest
     }
-
-    if last_itemID != '':
-        scan_kwargs['ExclusiveStartKey'] = {'itemID': last_itemID}
     
-    response = table.scan(**scan_kwargs)
+    response = table.query(**query_kwargs)
     return response.get('Items', [])
 
 def handler(event, context):
     try:
         headers = event.get("headers", {})
         
-        last_itemID = headers.get('lastItemID', '')
-        pageCount = headers.get('pagecount', 'failTest')
-        pageCount = int(pageCount) 
+        # Ensure we convert the timestamp from the headers to a float, as it's provided as a string
+        start_timestamp = headers.get('startTimestamp', '')
+        if start_timestamp:
+            start_timestamp = float(start_timestamp)
+        
+        pageCount = headers.get('pageCount', '10')
+        pageCount = int(pageCount)
         table_name = 'items-30144999'
         
-        items = fetch_items_after_itemID(table_name, last_itemID, pageCount)
+        items = fetch_items_from_timestamp(table_name, start_timestamp, pageCount)
         
         return {
             'statusCode': 200,
