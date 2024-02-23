@@ -2,8 +2,10 @@
 import React, { useState } from "react";
 import { Button, Select, Label, TextInput, Textarea } from "flowbite-react";
 import { FaSearch } from "react-icons/fa";
+import { useListItem } from "@/app/context/ListItemContext";
+import { Condition } from "@/app/interfaces/ListItemI";
 export default function ListingDetails() {
-  const [tags, setTags] = useState<string[]>([]);
+  const { tags, setTags } = useListItem();
   const [newTag, setNewTag] = useState<string>("");
   const handleAddTag = () => {
     if (newTag.length < 2) return;
@@ -38,25 +40,30 @@ export default function ListingDetails() {
         <div className="mb-2 block font-bold">
           <Label htmlFor="condition" value="Condition: (optional)" />
         </div>
-        <Select id="condition">
-          <option>-Select-</option>
-          <option>New</option>
-          <option>Used - Like new</option>
-          <option>Used - Good</option>
-          <option>Used - Fair</option>
+        <Select id="condition" name="condition">
+          {Object.values(Condition).map((cond) => (
+            <option key={cond} value={cond}>
+              {cond}
+            </option>
+          ))}
         </Select>
       </div>
       <div>
         <div className="mb-2 block font-bold">
           <Label htmlFor="listingTitle" value="Listing title" />
         </div>
-        <TextInput id="listingTitle" type="text" required />
+        <TextInput id="listingTitle" type="text" required name="listingTitle" />
       </div>
       <div>
         <div className="mb-2 block font-bold">
           <Label htmlFor="description" value="Description" />
         </div>
-        <Textarea id="description" placeholder="Enter a description" rows={4} />
+        <Textarea
+          id="description"
+          placeholder="Enter a description"
+          rows={4}
+          name="description"
+        />
       </div>
       <div>
         <div className="mb-2 block font-bold">
@@ -78,6 +85,7 @@ export default function ListingDetails() {
             helperText="Tag must be between 2-20 characters"
           />
         </div>
+        <input className="hidden" name="tags" value={JSON.stringify(tags)} />
 
         <div className="flex flex-row gap-4">
           <Button
@@ -87,13 +95,12 @@ export default function ListingDetails() {
           >
             Add tag
           </Button>
-
           <ul className="flex flex-wrap gap-2 w-full p-2 bg-slate-500 rounded-lg">
             {tags.map((tag, index) => (
               <Button
+                color={"primary"}
                 key={index}
                 size="xs"
-                className=" text-white rounded-full text-sm hover:opacity-90"
                 onClick={() => removeTag(index)}
               >
                 {tag}

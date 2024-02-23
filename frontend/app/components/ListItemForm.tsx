@@ -1,13 +1,14 @@
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import ListingDetails from "./listItemFormComponents/ListingDetails";
 import ListingMedia from "./listItemFormComponents/ListingMedia";
 import ListingLocation from "./listItemFormComponents/ListingLocation";
 import ListingContactInformation from "./listItemFormComponents/ListingContactInformation";
 import { toast } from "react-toastify";
 import { functionThatReturnPromise } from "../utils/mockPromise";
-import { Button } from "flowbite-react";
-
+import SubmitButton from "./SubmitButton";
+import { createListing } from "../actions";
+import { ListItemProvider } from "../context/ListItemContext";
 export default function ListItemForm() {
   const notify = () =>
     toast.promise(functionThatReturnPromise, {
@@ -15,25 +16,25 @@ export default function ListItemForm() {
       success: "Listing has been posted",
       error: "Listing rejected. Please try again later.",
     });
+
+  const ref = useRef<HTMLFormElement>(null);
   return (
     <form
+      ref={ref}
       className="flex flex-col gap-4 text-brand"
-      onSubmit={(e) => {
-        e.preventDefault();
+      action={async (formData) => {
+        await createListing(formData);
+        ref.current?.reset();
         notify();
       }}
     >
-      <ListingDetails></ListingDetails>
-      <ListingMedia></ListingMedia>
-      <ListingLocation></ListingLocation>
-      <ListingContactInformation></ListingContactInformation>
-      <Button
-        color={"primary"}
-        type="submit"
-        className="flex justify-center place-items-center items-center font-bold"
-      >
-        Post Listing
-      </Button>
+      <ListItemProvider>
+        <ListingDetails></ListingDetails>
+        <ListingMedia></ListingMedia>
+        <ListingLocation></ListingLocation>
+        <ListingContactInformation></ListingContactInformation>
+        <SubmitButton></SubmitButton>
+      </ListItemProvider>
     </form>
   );
 }
