@@ -61,4 +61,4 @@ def test_edit_item_in_table(dynamodb_mock):
     assert response['Item']['itemName'] == "aight \'em"
     assert response['Item']['description'] == "a new description"
     assert response['Item']['image'] == ['url2.com', 'url3.com']
-    assert response['Item']['imageHash'] == ['hashbrown', 'other thing']
+    assert response['Item']['imageHash'] == ['hashbrown', 'otherthing']
