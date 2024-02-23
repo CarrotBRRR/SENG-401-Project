@@ -32,7 +32,6 @@ def test_edit_item_in_table(dynamodb_mock):
         'itemName': 'Eye Temm',
         'itemID': '69420',
         'description': 'a description',
-        'maxBorrowDays': 69,
         'image': 'url.com',
         'imageHash': 'HAHAHASH'
     }

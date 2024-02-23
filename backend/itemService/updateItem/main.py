@@ -80,19 +80,19 @@ def handler(event, context):
         # Get the table and retrieve the old values
         table_name = 'items-30144999'
         table = get_dynamodb_table(table_name)
-        old_image_hashes = table.get_item(Key={"itemID": itemID})["Item"]["imageHashes"]
-        timestamp = table.get_item(Key={"itemID": itemID})["Item"]["timestamp"]
+        item = table.get_item(Key={"itemID": itemID})["Item"]
+        
+        old_image_hashes = item["imageHashes"]
+        timestamp = item["timestamp"]
+        lenderID = item["lenderID"]
 
         # Parse the event body
         body = parse_event_body(event["body"])
         itemID = body["itemID"]
 
         # Get the new values
-        lenderID = body['lenderID']
-        lenderID = body['lenderID']
         itemName = body["name"]
         description = body["description"]
-        maxBorrowDays = body["max_borrow_days"]
 
         # Get the image and hashes
         raw_images = body["images"]
@@ -125,8 +125,8 @@ def handler(event, context):
             'lenderID': lenderID,
             'itemName': itemName,
             'description': description,
-            'image': image_url,
-            'imageHash': image_hash,
+            'image': image_urls,
+            'imageHash': image_hashes,
             'timestamp': timestamp,
             'borrowerID': None
         }
