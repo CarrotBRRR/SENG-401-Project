@@ -7,24 +7,28 @@ import {
   DropdownItem,
   Navbar,
   NavbarBrand,
-  NavbarCollapse,
-  NavbarLink,
-  NavbarToggle,
 } from "flowbite-react";
-import { Label, TextInput } from "flowbite-react";
+import { TextInput } from "flowbite-react";
 import { FaLocationDot } from "react-icons/fa6";
 
 import { FaSearch } from "react-icons/fa";
 import Image from "next/image";
 export default function Header() {
+  const dropdownOptions = [
+    "Hand Tools",
+    "Power Tools",
+    "Outdoor & Garden",
+    "Hammers",
+    "Sports",
+  ];
   return (
     <Navbar fluid rounded>
       <NavbarBrand href="/">
         <Image
           height={36}
           width={36}
-          src="/favicon.svg"
-          className="mr-3 h-6 sm:h-9"
+          src="/favicon.png"
+          className="mr-3 rounded"
           alt="ToolShed Logo"
         />
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
@@ -40,11 +44,9 @@ export default function Header() {
         />
 
         <Dropdown inline label="All categories">
-          <DropdownItem>Hand Tools</DropdownItem>{" "}
-          <DropdownItem>Power Tools</DropdownItem>{" "}
-          <DropdownItem>Outdoor & Garden</DropdownItem>{" "}
-          <DropdownItem>Hammers</DropdownItem>
-          <DropdownItem>Sports</DropdownItem>
+          {dropdownOptions.map((option) => (
+            <DropdownItem key={option}>{option}</DropdownItem>
+          ))}
         </Dropdown>
         <div className="hidden sm:flex flex-row place-items-center gap-2 ">
           <div className="rounded-full opacity-80 p-2 bg-brand">
