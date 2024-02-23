@@ -33,7 +33,6 @@ def test_insert_item_in_table(dynamodb_mock):
         'itemName': "Eye Temm",
         'itemID': '69420',
         'description': "a description",
-        'maxBorrowDays': 69,
         'image': ["url.com", 'anotherurl.com'],
         'imageHash': ["HAHAHASH", "anotherHAHAsh"]
     }
@@ -49,7 +48,6 @@ def test_insert_item_in_table(dynamodb_mock):
     assert response['Item']['lenderID'] == 'Len Derr'
     assert response['Item']['itemName'] == 'Eye Temm'
     assert response['Item']['description'] == 'a description'
-    assert response['Item']['maxBorrowDays'] == 69
     assert response['Item']['image'] == ["url.com", 'anotherurl.com']
     assert response['Item']['imageHash'] == ["HAHAHASH", "anotherHAHAsh"]
 

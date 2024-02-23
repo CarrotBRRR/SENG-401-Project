@@ -48,9 +48,8 @@ def test_edit_item_in_table(dynamodb_mock):
         'itemName': 'aight \'em',
         'lenderID': 'Len Derr',
         'description': 'a new description',
-        'maxBorrowDays': 420,
         'image': ['url2.com', 'url3.com'],
-        'imageHash': ['hashbrown', 'other thing']
+        'imageHash': ['hashbrown', 'otherthing']
     }
 
     update = update_item_in_table(table, mock_update)
@@ -61,6 +60,5 @@ def test_edit_item_in_table(dynamodb_mock):
 
     assert response['Item']['itemName'] == "aight \'em"
     assert response['Item']['description'] == "a new description"
-    assert response['Item']['maxBorrowDays'] == 420
     assert response['Item']['image'] == ['url2.com', 'url3.com']
     assert response['Item']['imageHash'] == ['hashbrown', 'other thing']

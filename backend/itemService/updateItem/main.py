@@ -125,7 +125,6 @@ def handler(event, context):
             'lenderID': lenderID,
             'itemName': itemName,
             'description': description,
-            'maxBorrowDays': maxBorrowDays,
             'image': image_url,
             'imageHash': image_hash,
             'timestamp': timestamp,
