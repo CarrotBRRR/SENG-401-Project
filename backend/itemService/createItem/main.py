@@ -117,7 +117,8 @@ def handler(event, context):
             'maxBorrowDays': maxBorrowDays,
             'image': image_url,
             'imageHash': image_hash,
-            'timestamp': time
+            'timestamp': time,
+            'borrowerID': None
         }
 
         # Insert the item into the table

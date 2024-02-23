@@ -118,7 +118,8 @@ def handler(event, context):
             'maxBorrowDays': maxBorrowDays,
             'image': image_url,
             'imageHash': image_hash,
-            'timestamp': timestamp
+            'timestamp': timestamp,
+            'borrowerID': None
         }
 
         # Update the item in the table
