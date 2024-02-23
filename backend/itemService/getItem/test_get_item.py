@@ -29,39 +29,33 @@ def items_table(dynamodb_mock):
     )
     return table
 
-def test_parse_event_body():
-    assert parse_event_body('{"key": "value"}') == {"key": "value"}
-    assert parse_event_body({"key": "value"}) == {"key": "value"}
+def test_fetch_items_from_timestamp(dynamodb_mock, items_table):
+    """Test the fetch_items_from_timestamp function."""
+    items_table.put_item(Item={'itemID': '1', 'timestamp': 1613544690})
+    items_table.put_item(Item={'itemID': '2', 'timestamp': 1613544691})
+    items_table.put_item(Item={'itemID': '3', 'timestamp': 1613544692})
 
-
-def test_fetch_items_after_itemID_no_lastItemID(items_table):
-    items_table.put_item(Item={'itemID': '1'})
-    items_table.put_item(Item={'itemID': '2'})
-    items = fetch_items_after_itemID('items-30144999', '', 1)
+    items = fetch_items_from_timestamp('items-30144999', 1613544691, 2)
     assert len(items) == 1
+    assert items[0]['itemID'] == '1'
+    assert items[0]['timestamp'] == 1613544690
 
+def test_handler(dynamodb_mock, items_table):
+    """Test the handler function."""
+    items_table.put_item(Item={'itemID': '1', 'timestamp': 1613544690})
+    items_table.put_item(Item={'itemID': '2', 'timestamp': 1613544691})
+    items_table.put_item(Item={'itemID': '3', 'timestamp': 1613544692})
 
-def test_handler_with_lastItemID(dynamodb_mock, items_table):
-    items_table.put_item(Item={'itemID': '1'})
-    items_table.put_item(Item={'itemID': '2'})
     event = {
-        'headers': {'lastItemID': '1', 'pagecount': 1}
+        "headers": {
+            "startTimestamp": "1613544691",
+            "pageCount": "2"
+        }
     }
-    response = handler(event, None)
+    response = handler(event, {})
+    body = json.loads(response['body'])
+    items = body['items']
     assert response['statusCode'] == 200
-    items = json.loads(response['body'])['items']
     assert len(items) == 1
-    assert items[0]['itemID'] == '2'
-
-def test_handler_no_lastItemID(dynamodb_mock, items_table):
-    items_table.put_item(Item={'itemID': '1'})
-    items_table.put_item(Item={'itemID': '2'})
-    event = {
-        'headers': {'pagecount': 2}
-    }
-    response = handler(event, None)
-    assert response['statusCode'] == 200
-    print(response)
-    items = json.loads(response['body'])['items']
-    assert len(items) == 2
-
+    assert items[0]['itemID'] == '1'
+    assert items[0]['timestamp'] == 1613544690

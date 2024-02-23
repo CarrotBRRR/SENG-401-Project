@@ -7,11 +7,6 @@ def get_dynamodb_table(table_name):
     table = dynamodb.Table(table_name)
     return table
 
-def parse_event_body(event_body):
-    """Parse the event body, converting from JSON string to dictionary if necessary."""
-    if isinstance(event_body, str):
-        return json.loads(event_body)
-    return event_body
 
 def fetch_items_from_timestamp(table_name, start_timestamp, pageCount):
     table = get_dynamodb_table(table_name)
