@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Button,
   Dropdown,
   DropdownDivider,
@@ -9,13 +8,11 @@ import {
 } from "flowbite-react";
 import { TextInput } from "flowbite-react";
 import { FaLocationDot } from "react-icons/fa6";
-
 import { FaSearch } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/utils/authOptions";
-import AuthenticationButton from "./AuthenticationButton";
 
 function Logo() {
   return (
@@ -34,22 +31,36 @@ function Logo() {
   );
 }
 
-function UserProfile() {
+function UserProfile({
+  sessionUser,
+}: {
+  sessionUser:
+    | {
+        name?: string | null | undefined;
+        email?: string | null | undefined;
+        image?: string | null | undefined;
+      }
+    | null
+    | undefined;
+}) {
+  const imageSrc = sessionUser?.image || "";
   return (
     <Dropdown
       inline
       label={
-        <Avatar
-          alt="User settings"
-          img="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-          rounded
+        <Image
+          src={imageSrc}
+          width={50}
+          height={50}
+          alt="profile image"
+          className="rounded-full"
         />
       }
     >
       <DropdownHeader>
-        <span className="block text-sm">Bonnie Green</span>
+        <span className="block text-sm">{sessionUser?.name}</span>
         <span className="block truncate text-sm font-medium">
-          name@flowbite.com
+          {sessionUser?.email}
         </span>
       </DropdownHeader>
       <DropdownItem>My Profile</DropdownItem>
@@ -57,13 +68,16 @@ function UserProfile() {
       <DropdownItem>Active Listings</DropdownItem>
       <DropdownItem>Disputes</DropdownItem>
       <DropdownDivider />
-      <DropdownItem>Sign out</DropdownItem>
+      <DropdownItem as="a" href="/api/auth/signout">
+        Sign out
+      </DropdownItem>
     </Dropdown>
   );
 }
 
 export default async function Header() {
   const session = await getServerSession(authOptions);
+  const sessionUser = session && session.user;
   const dropdownOptions = [
     "Hand Tools",
     "Power Tools",
@@ -81,7 +95,6 @@ export default async function Header() {
           icon={FaSearch}
           placeholder="What are you looking for?"
         />
-
         <Dropdown inline label="All categories">
           {dropdownOptions.map((option) => (
             <DropdownItem key={option}>{option}</DropdownItem>
@@ -94,13 +107,28 @@ export default async function Header() {
           <div className=" text-sm">Calgary, Alberta</div>
         </div>
       </div>
-      <div className="flex  gap-4">
-        <UserProfile />
+      <div className="flex flex-row gap-4 place-items-center place-content-center">
+        {session ? (
+          <UserProfile sessionUser={sessionUser} />
+        ) : (
+          <Link href="/api/auth/signin">
+            <Button
+              className="transition duration-300 ease-in-out transform hover:scale-105"
+              gradientDuoTone="purpleToBlue"
+            >
+              {"Sign in"}
+            </Button>
+          </Link>
+        )}
         <Link href="/upload">
-          <Button color="primary">List Items</Button>
+          <Button
+            color="primary"
+            className="transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            List Items
+          </Button>
         </Link>
       </div>
-      <AuthenticationButton></AuthenticationButton>
     </Navbar>
   );
 }
