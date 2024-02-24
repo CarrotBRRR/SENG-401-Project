@@ -13,7 +13,57 @@ import { FaLocationDot } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
-export default function Header() {
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/utils/authOptions";
+import AuthenticationButton from "./AuthenticationButton";
+
+function Logo() {
+  return (
+    <Link href="/" className="flex flex-row">
+      <Image
+        height={36}
+        width={36}
+        src="/favicon.png"
+        className="mr-3 rounded"
+        alt="ToolShed Logo"
+      />
+      <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
+        ToolShed
+      </span>
+    </Link>
+  );
+}
+
+function UserProfile() {
+  return (
+    <Dropdown
+      inline
+      label={
+        <Avatar
+          alt="User settings"
+          img="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+          rounded
+        />
+      }
+    >
+      <DropdownHeader>
+        <span className="block text-sm">Bonnie Green</span>
+        <span className="block truncate text-sm font-medium">
+          name@flowbite.com
+        </span>
+      </DropdownHeader>
+      <DropdownItem>My Profile</DropdownItem>
+      <DropdownItem>Requested Tools</DropdownItem>
+      <DropdownItem>Active Listings</DropdownItem>
+      <DropdownItem>Disputes</DropdownItem>
+      <DropdownDivider />
+      <DropdownItem>Sign out</DropdownItem>
+    </Dropdown>
+  );
+}
+
+export default async function Header() {
+  const session = await getServerSession(authOptions);
   const dropdownOptions = [
     "Hand Tools",
     "Power Tools",
@@ -23,18 +73,7 @@ export default function Header() {
   ];
   return (
     <Navbar fluid rounded>
-      <Link href="/" className="flex flex-row">
-        <Image
-          height={36}
-          width={36}
-          src="/favicon.png"
-          className="mr-3 rounded"
-          alt="ToolShed Logo"
-        />
-        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-          ToolShed
-        </span>
-      </Link>
+      <Logo />
 
       <div className="flex order-2 md:order-none gap-4 place-items-center justify-center items-center">
         <TextInput
@@ -56,33 +95,12 @@ export default function Header() {
         </div>
       </div>
       <div className="flex  gap-4">
-        <Dropdown
-          inline
-          label={
-            <Avatar
-              alt="User settings"
-              img="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-              rounded
-            />
-          }
-        >
-          <DropdownHeader>
-            <span className="block text-sm">Bonnie Green</span>
-            <span className="block truncate text-sm font-medium">
-              name@flowbite.com
-            </span>
-          </DropdownHeader>
-          <DropdownItem>My Profile</DropdownItem>
-          <DropdownItem>Requested Tools</DropdownItem>
-          <DropdownItem>Active Listings</DropdownItem>
-          <DropdownItem>Disputes</DropdownItem>
-          <DropdownDivider />
-          <DropdownItem>Sign out</DropdownItem>
-        </Dropdown>
+        <UserProfile />
         <Link href="/upload">
           <Button color="primary">List Items</Button>
         </Link>
       </div>
+      <AuthenticationButton></AuthenticationButton>
     </Navbar>
   );
 }

@@ -5,3 +5,5 @@ export const createListing = async (formData: FormData) => {
   //   parse and Send to API endpoint
   console.log(rawFormData);
 };
+
+export const signOut = () => {};
