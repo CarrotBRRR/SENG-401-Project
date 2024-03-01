@@ -62,3 +62,50 @@ def items_table(dynamodb_mock):
     )
     return table
 
+
+def test_update_item_in_table(items_table):
+    items_table.put_item(
+        Item={
+            'itemID': '1',
+            'borrowerID': None,
+            'timestamp': 1234567890,
+            'location': 'Vancouver',
+
+        }
+    )
+    update_item_in_table(items_table, '1', 'JX152')
+    response = items_table.get_item(
+        Key={'itemID': '1'}
+    )
+    assert response['Item']['borrowerID'] == 'JX152', "Should update the borrowerID in the table."
+
+def test_remove_borrower_id_from_borrow_requests(items_table):
+    items_table.put_item(
+        Item={
+            'itemID': '1',
+            'borrowRequests': ['JX152', 'JX153'],
+            'timestamp': 1234567890,
+            'location': 'Vancouver',
+        }
+    )
+    remove_borrower_id_from_borrow_requests(items_table, '1', 0)
+    response = items_table.get_item(
+        Key={'itemID': '1'}
+    )
+    assert response['Item']['borrowRequests'] == ['JX153'], "Should remove the borrowerID from the borrowRequests array in the table."
+
+def test_handler_with_valid_borrowerID(items_table):
+    items_table.put_item(
+        Item={
+            'itemID': '1',
+            'borrowRequests': ['JX152', 'JX153'],
+            'timestamp': 1234567890,
+            'location': 'Vancouver',
+        }
+    )
+    event = {
+        "body": '{"itemID": "1", "borrowerID": "JX152"}'
+    }
+    response = handler(event, None)
+    assert response['statusCode'] == 200, "Should return a 200 status code."
+    assert json.loads(response['body'])['Attributes']['borrowRequests'] == ['JX153'], "Should remove the borrowerID from the borrowRequests array in the table."
