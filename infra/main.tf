@@ -110,11 +110,11 @@ resource "aws_dynamodb_table" "items_dynamodb_table" {
   # up to 1KB per second
   write_capacity = 1
 
-  hash_key = "itemID"
+  hash_key = "location"
   range_key = "timestamp"  # Sort key
 
   attribute {
-    name = "itemID"
+    name = "location"
     type = "S"
   }
   attribute {
