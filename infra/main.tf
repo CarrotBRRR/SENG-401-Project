@@ -121,6 +121,16 @@ resource "aws_lambda_function" "update_item_lambda" {
   source_code_hash = filebase64sha256("./updateItem.zip")
 }
 
+resource "aws_lambda_function" "request_item_lambda" {
+  filename         = "./requestItem.zip"
+  function_name    = "request-item-30144999"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main.handler"
+  runtime          = "python3.9"
+  timeout = 300
+  source_code_hash = filebase64sha256("./requestItem.zip")
+}
+
 
 resource "aws_dynamodb_table" "items_dynamodb_table" {
   name         = "items-30144999"
@@ -397,6 +407,19 @@ resource "aws_lambda_function_url" "url_get_account" {
 
 resource "aws_lambda_function_url" "url_update_account" {
   function_name      = aws_lambda_function.update_account_lambda.function_name
+  authorization_type = "NONE"
+
+  cors {
+    allow_credentials = true
+    allow_origins     = ["*"]
+    allow_methods     = ["PUT"]
+    allow_headers     = ["*"]
+    expose_headers    = ["keep-alive", "date"]
+  }
+}
+
+resource "aws_lambda_function_url" "url_request_item" {
+  function_name      = aws_lambda_function.request_item_lambda.function_name
   authorization_type = "NONE"
 
   cors {
