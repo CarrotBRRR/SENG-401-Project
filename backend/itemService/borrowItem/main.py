@@ -27,6 +27,18 @@ def update_item_in_table(table, itemID, borrowerID):
     )
     return response
 
+def remove_borrower_id_from_borrow_requests(table, itemID, borrowerID_index):
+    """Remove a borrowerID from the borrowRequests array in the DynamoDB table."""
+    response = table.update_item(
+        Key={
+            'itemID': itemID
+        },
+        UpdateExpression="REMOVE borrowRequests[{}]"
+        .format(borrowerID_index),
+        ReturnValues="UPDATED_NEW"
+    )
+    return response
+
 def handler(event, context):
     try:
         table_name = 'items-30144999'
@@ -35,7 +47,18 @@ def handler(event, context):
         itemID = body["itemID"]
         borrowerID = body["borrowerID"]
         
-        response = update_item_in_table(table, itemID, borrowerID)
+        current_item = table.get_item(
+            Key={'itemID': itemID}
+        )
+        if 'Item' not in current_item or 'borrowRequests' not in current_item['Item']:
+            raise ValueError("Item or borrowRequests not found")
+
+        borrow_requests = current_item['Item']['borrowRequests']
+        if borrowerID in borrow_requests:
+            borrowerID_index = borrow_requests.index(borrowerID)
+            response = remove_borrower_id_from_borrow_requests(table, itemID, borrowerID_index)
+        else:
+            raise ValueError("borrowerID not found in borrowRequests")
         
         return {
             'statusCode': 200,
@@ -46,4 +69,3 @@ def handler(event, context):
             'statusCode': 500,
             'body': json.dumps(str(e))
         }
-
