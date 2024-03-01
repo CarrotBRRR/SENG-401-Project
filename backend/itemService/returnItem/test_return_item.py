@@ -16,17 +16,42 @@ def dynamodb_mock(aws_credentials):
     with mock_aws():
         yield
 
+
 @pytest.fixture
-def dynamodb_table(dynamodb_mock):
+def items_table(dynamodb_mock):
     """Create a mock DynamoDB table."""
-    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-    dynamodb.create_table(
+    table = dynamodb_mock.create_table(
         TableName='items-30144999',
-        KeySchema=[{'AttributeName': 'itemID', 'KeyType': 'HASH'}],
-        AttributeDefinitions=[{'AttributeName': 'itemID', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
+        KeySchema=[
+            {'AttributeName': 'itemID', 'KeyType': 'HASH'},
+        ],
+        AttributeDefinitions=[
+            {'AttributeName': 'location', 'AttributeType': 'S'},
+            {'AttributeName': 'timestamp', 'AttributeType': 'N'},
+            {'AttributeName': 'itemID', 'AttributeType': 'S'}
+        ],
+        ProvisionedThroughput={
+            'ReadCapacityUnits': 1,
+            'WriteCapacityUnits': 1
+        },
+        GlobalSecondaryIndexes=[
+            {
+                'IndexName': 'LocationTimestampIndex',
+                'KeySchema': [
+                    {'AttributeName': 'location', 'KeyType': 'HASH'},
+                    {'AttributeName': 'timestamp', 'KeyType': 'RANGE'} 
+                ],
+                'Projection': {
+                    'ProjectionType': 'ALL'
+                },
+                'ProvisionedThroughput': {
+                    'ReadCapacityUnits': 1,
+                    'WriteCapacityUnits': 1
+                }
+            }
+        ]
     )
-    return dynamodb.Table('items-30144999')
+    return table
 
 def test_parse_event_body_with_dict():
     event_body = {"key": "value"}
