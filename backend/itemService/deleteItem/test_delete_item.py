@@ -23,38 +23,13 @@ def dynamodb_mock(aws_credentials):
 @pytest.fixture
 def items_table(dynamodb_mock):
     """Create a mock DynamoDB table."""
-    dynamodb_mock.create_table(
+    table = dynamodb_mock.create_table(
         TableName='items-30144999',
-        KeySchema=[
-            {'AttributeName': 'itemID', 'KeyType': 'HASH'},
-        ],
-        AttributeDefinitions=[
-            {'AttributeName': 'location', 'AttributeType': 'S'},
-            {'AttributeName': 'timestamp', 'AttributeType': 'N'},
-            {'AttributeName': 'itemID', 'AttributeType': 'S'}
-        ],
-        ProvisionedThroughput={
-            'ReadCapacityUnits': 1,
-            'WriteCapacityUnits': 1
-        },
-        GlobalSecondaryIndexes=[
-            {
-                'IndexName': 'LocationTimestampIndex',
-                'KeySchema': [
-                    {'AttributeName': 'location', 'KeyType': 'HASH'},
-                    {'AttributeName': 'timestamp', 'KeyType': 'RANGE'} 
-                ],
-                'Projection': {
-                    'ProjectionType': 'ALL'
-                },
-                'ProvisionedThroughput': {
-                    'ReadCapacityUnits': 1,
-                    'WriteCapacityUnits': 1
-                }
-            }
-        ]
+        KeySchema=[{'AttributeName': 'itemID', 'KeyType': 'HASH'}],
+        AttributeDefinitions=[{'AttributeName': 'itemID', 'AttributeType': 'S'}],
+        ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
     )
-    return dynamodb_mock.Table('items-30144999')
+    return table
 
 
 def test_remove_item(items_table):
