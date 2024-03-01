@@ -88,9 +88,11 @@ def handler(event, context):
         body = parse_event_body(event["body"])
 
         lenderID = body['lenderID']
-        itemName = body['name']
+        itemName = body['listingTitle']
         description = body['description']
-        maxBorrowDays = body['max_borrow_days']
+        condition = body['condition']
+        location = body['location']
+        tags = body['tags']
 
         # Create a unique item ID
         itemID = str(uuid.uuid4())
@@ -119,11 +121,14 @@ def handler(event, context):
         # Prepare the data to be inserted into the table
         data = {
             'itemID': itemID,
-            'lenderID': lenderID,
             'itemName': itemName,
+            'condition': condition,
             'description': description,
-            'image': image_urls,
-            'imageHash': image_hashes,
+            'tags': tags,
+            'location': location,
+            'images': image_urls,
+            'imageHashes': image_hashes,
+            'lenderID': lenderID,
             'timestamp': time,
             'borrowerID': None
         }

@@ -2,15 +2,18 @@ import json
 import boto3
 import uuid
 
-dynamodb_resource = boto3.resource("dynamodb")
-table = dynamodb_resource.Table("users_dynamodb_table")  
 
-def handler(event, context):
+def handler(event, context, table=None):
+    # pass in table for testing
+    if table is None:
+        dynamodb_resource = boto3.resource("dynamodb", region_name='ca-central-1')
+        table = dynamodb_resource.Table("users-30144999")  
+
     data = json.loads(event["body"])
     try:
         item={
             "userID": str(uuid.uuid4()),
-            "userName": data["name"],
+            "name": data["name"],
             "email": data["email"],
             "rating": data["rating"],
             "bio": data["bio"],

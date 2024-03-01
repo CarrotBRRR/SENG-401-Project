@@ -80,19 +80,22 @@ def handler(event, context):
         # Get the table and retrieve the old values
         table_name = 'items-30144999'
         table = get_dynamodb_table(table_name)
-        old_image_hashes = table.get_item(Key={"itemID": itemID})["Item"]["imageHashes"]
-        timestamp = table.get_item(Key={"itemID": itemID})["Item"]["timestamp"]
+        item = table.get_item(Key={"itemID": itemID})["Item"]
+        
+        old_image_hashes = item["imageHashes"]
+        timestamp = item["timestamp"]
+        lenderID = item["lenderID"]
 
         # Parse the event body
         body = parse_event_body(event["body"])
         itemID = body["itemID"]
 
         # Get the new values
-        lenderID = body['lenderID']
-        lenderID = body['lenderID']
         itemName = body["name"]
         description = body["description"]
-        maxBorrowDays = body["max_borrow_days"]
+        condition = body["condition"]
+        location = body["location"]
+        tags = body["tags"]
 
         # Get the image and hashes
         raw_images = body["images"]
@@ -122,14 +125,18 @@ def handler(event, context):
         # Create a new item object
         newInfo = {
             'itemID': itemID,
-            'lenderID': lenderID,
             'itemName': itemName,
+            'condition': condition,
             'description': description,
-            'image': image_url,
-            'imageHash': image_hash,
+            'tags': tags,
+            'location': location,
+            'images': image_urls,
+            'imageHashes': image_hashes,
+            'lenderID': lenderID,
             'timestamp': timestamp,
             'borrowerID': None
         }
+
 
         # Update the item in the table
         response = update_item_in_table(table, newInfo)

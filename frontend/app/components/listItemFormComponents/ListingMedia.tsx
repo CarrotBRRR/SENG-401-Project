@@ -1,13 +1,8 @@
+import ListItemFormTemplate from "./ListItemFormTemplate";
 import UploadImageComponent from "./UploadImageComponent";
 export default function ListingMedia() {
   return (
-    <div className="flex flex-col gap-4 border p-4 rounded shadow">
-      <div className=" flex flex-row place-items-center gap-4">
-        <div className=" rounded-lg bg-gray-200 p-2 size-8 justify-center items-center flex">
-          2
-        </div>
-        <div className=" text-xl font-medium text-black ">Media</div>
-      </div>
+    <ListItemFormTemplate formNumber={2} formHeader={"Media"}>
       <div className=" flex flex-col gap-2.5 text-sm">
         <h2 className="text-brand font-bold ">
           Add photos to attract interest to your item
@@ -23,7 +18,7 @@ export default function ListingMedia() {
           Click on a frame to upload an image.
         </h3>
       </div>
-      <UploadImageComponent></UploadImageComponent>
-    </div>
+      <UploadImageComponent />
+    </ListItemFormTemplate>
   );
 }

@@ -5,6 +5,10 @@ import { ToastContainer } from "react-toastify";
 export default function ToastComponent() {
   const { theme } = useTheme();
   return (
-    <ToastContainer position="bottom-right" theme={theme}></ToastContainer>
+    <ToastContainer
+      position="bottom-right"
+      className="text-black dark:text-white"
+      theme={theme}
+    ></ToastContainer>
   );
 }

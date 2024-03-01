@@ -32,9 +32,13 @@ def test_insert_item_in_table(dynamodb_mock):
         'lenderID': "Len Derr",
         'itemName': "Eye Temm",
         'itemID': '69420',
+        'condition': 'Used - Good',
         'description': "a description",
+        'tags': ['tag', 'you\'re it'],
+        'location': 'your mom',
         'image': ["url.com", 'anotherurl.com'],
         'imageHash': ["HAHAHASH", "anotherHAHAsh"],
+        'timestamp': '1234567890',
         'borrowerID': None
     }
 
@@ -45,10 +49,18 @@ def test_insert_item_in_table(dynamodb_mock):
     assert insertion['ResponseMetadata']['HTTPStatusCode'] == 200
 
     assert 'Item' in response
-    assert response['Item']['itemID'] == '69420'
+
     assert response['Item']['lenderID'] == 'Len Derr'
+    assert response['Item']['borrowerID'] == None
+
+    assert response['Item']['itemID'] == '69420'
     assert response['Item']['itemName'] == 'Eye Temm'
     assert response['Item']['description'] == 'a description'
+    assert response['Item']['condition'] == 'Used - Good'
+    assert response['Item']['location'] == 'your mom'
+    assert response['Item']['timestamp'] == '1234567890'
+    assert response['Item']['tags'] == ['tag', 'you\'re it']
+
     assert response['Item']['image'] == ["url.com", 'anotherurl.com']
     assert response['Item']['imageHash'] == ["HAHAHASH", "anotherHAHAsh"]
-    assert response['Item']['borrowerID'] == None
+

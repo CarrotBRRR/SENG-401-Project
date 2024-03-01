@@ -2,6 +2,7 @@ import React from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import ListingMapContainer from "./ListingMapContainer";
 import { Tooltip } from "flowbite-react";
+import ListItemFormTemplate from "./ListItemFormTemplate";
 
 export default function ListingLocation() {
   const city = "Calgary";
@@ -10,15 +11,9 @@ export default function ListingLocation() {
   const location = "Calgary, AB T3A 7V4";
 
   return (
-    <div className="flex flex-row gap-4 border p-4 rounded shadow justify-between">
-      <div className="flex flex-col ">
-        <div className=" flex flex-row place-items-center gap-4">
-          <div className=" rounded-lg bg-gray-200 p-2 size-8 justify-center items-center flex">
-            3
-          </div>
-          <div className=" text-xl font-medium text-black ">Location</div>
-        </div>
-        <div className=" flex flex-col gap-2.5 text-sm">
+    <ListItemFormTemplate formNumber={3} formHeader={"Location"}>
+      <div className="flex flex-row justify-between items-center place-items-center place-content-center ">
+        <div className=" flex flex-col gap-4 text-sm">
           <h2 className="text-brand font-bold ">
             {city}, {postalCode}
           </h2>
@@ -45,14 +40,9 @@ export default function ListingLocation() {
             </Tooltip>
           </div>
         </div>
+        <ListingMapContainer />
       </div>
-      <ListingMapContainer></ListingMapContainer>
-      <input
-        className="hidden"
-        name="location"
-        value={location}
-        readOnly
-      ></input>
-    </div>
+      <input className="hidden" name="location" value={location} readOnly />
+    </ListItemFormTemplate>
   );
 }

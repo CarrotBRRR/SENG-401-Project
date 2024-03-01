@@ -4,6 +4,7 @@ import { Button, Select, Label, TextInput, Textarea } from "flowbite-react";
 import { FaSearch } from "react-icons/fa";
 import { useListItem } from "@/app/context/ListItemContext";
 import { Condition } from "@/app/interfaces/ListItemI";
+import ListItemFormTemplate from "./ListItemFormTemplate";
 export default function ListingDetails() {
   const { tags, setTags } = useListItem();
   const [newTag, setNewTag] = useState<string>("");
@@ -21,13 +22,7 @@ export default function ListingDetails() {
   };
 
   return (
-    <div className="flex flex-col gap-4 border p-4 rounded shadow justify-between">
-      <div className=" flex flex-row place-items-center gap-4">
-        <div className=" rounded-lg bg-gray-200 p-2 size-8 justify-center items-center flex">
-          1
-        </div>
-        <div className=" text-xl font-medium text-black ">Listing Details</div>
-      </div>
+    <ListItemFormTemplate formNumber={1} formHeader={"ListingDetails"}>
       <div className=" inline-flex flex-row justify-start items-center gap-2.5 whitespace-nowrap text-sm cursor-pointer">
         <p className="text-brand font-medium">Select Category:</p>
         <p className="text-brand font-bold ">
@@ -35,7 +30,6 @@ export default function ListingDetails() {
         </p>
         <p className="text-blue-500 font-bold ">Change category</p>
       </div>
-
       <div>
         <div className="mb-2 block font-bold">
           <Label htmlFor="condition" value="Condition: (optional)" />
@@ -114,6 +108,6 @@ export default function ListingDetails() {
           </ul>
         </div>
       </div>
-    </div>
+    </ListItemFormTemplate>
   );
 }
