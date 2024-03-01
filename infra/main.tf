@@ -144,6 +144,17 @@ resource "aws_dynamodb_table" "items_dynamodb_table" {
     type = "N"
   }
 
+    attribute {
+    name = "itemID"
+    type = "S"
+  }
+  global_secondary_index {
+    name               = "IndexItemID"
+    hash_key           = "itemID"
+    projection_type    = "ALL"
+    read_capacity      = 1
+    write_capacity     = 1
+  }
 }
 
 resource "aws_lambda_function" "create_account_lambda" {
