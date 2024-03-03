@@ -3,7 +3,7 @@ export const DetailField = ({
   value,
 }: {
   title: string;
-  value: string | number;
+  value?: string | number | null | undefined;
 }) => {
   return (
     <div className="flex flex-col gap-2">

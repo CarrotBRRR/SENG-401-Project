@@ -1,9 +1,17 @@
 import React from "react";
 import Image from "next/image";
 import { DetailField } from "./DetailField";
-export default function PersonalDetails() {
-  const name = "John Doe";
-  const city = "Calgary";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/utils/authOptions";
+import UserLocation from "./UserLocation";
+export default async function PersonalDetails() {
+  const session = await getServerSession(authOptions);
+  const name = session?.user?.name;
+  // const city = "Calgary";
+  // const city =
+  //   navigator.geolocation.getCurrentPosition((position) => {
+  //     return position.coords.latitude;
+  //   }) || "Calgary";
   const state = "Alberta";
 
   return (
@@ -19,8 +27,7 @@ export default function PersonalDetails() {
         />
         <div className="flex flex-col gap-4 text-black dark:text-white">
           <DetailField title={"Name"} value={name} />
-          <DetailField title={"Gender"} value={"Female"} />
-          <DetailField title={"City"} value={city} />
+          <UserLocation></UserLocation>
           <DetailField title={"State"} value={state} />
         </div>
       </div>
