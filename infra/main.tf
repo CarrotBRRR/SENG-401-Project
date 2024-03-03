@@ -39,6 +39,28 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
+resource "aws_iam_policy" "cloudwatch_policy" {
+  name        = "lambda-logging"
+  description = "IAM policy for logging from a lambda"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:*",
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_lambda_function" "create_item_lambda" {
   filename         = "./createItem.zip"
   function_name    = "create-item-30144999"
@@ -99,26 +121,52 @@ resource "aws_lambda_function" "update_item_lambda" {
   source_code_hash = filebase64sha256("./updateItem.zip")
 }
 
+resource "aws_lambda_function" "request_item_lambda" {
+  filename         = "./requestItem.zip"
+  function_name    = "request-item-30144999"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main.handler"
+  runtime          = "python3.9"
+  timeout = 300
+  source_code_hash = filebase64sha256("./requestItem.zip")
+}
+
 
 resource "aws_dynamodb_table" "items_dynamodb_table" {
   name         = "items-30144999"
   billing_mode = "PROVISIONED"
 
-  # up to 8KB read per second (eventually consistent)
   read_capacity = 1
-
-  # up to 1KB per second
   write_capacity = 1
 
   hash_key = "itemID"
 
-  # the hash_key data type is string
   attribute {
     name = "itemID"
     type = "S"
   }
 
+  attribute {
+    name = "location"
+    type = "S"
+  }
+
+  attribute {
+    name = "timestamp"
+    type = "N"
+  }
+
+  # Define a new Global Secondary Index for location and timestamp
+  global_secondary_index {
+    name               = "LocationTimestampIndex"
+    hash_key           = "location"
+    range_key          = "timestamp"
+    projection_type    = "ALL"
+    read_capacity      = 1
+    write_capacity     = 1
+  }
 }
+
 
 resource "aws_lambda_function" "create_account_lambda" {
   filename         = "./createAccount.zip"
@@ -224,6 +272,11 @@ resource "aws_iam_policy" "parameter_store_policy" {
 
 resource "aws_iam_role_policy_attachment" "dynamodb_policy_attachment" {
   policy_arn = aws_iam_policy.dynamodb_policy.arn
+  role       = aws_iam_role.lambda_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_policy_attatchment" {
+  policy_arn = aws_iam_policy.cloudwatch_policy.arn
   role       = aws_iam_role.lambda_role.name
 }
 
@@ -354,6 +407,19 @@ resource "aws_lambda_function_url" "url_get_account" {
 
 resource "aws_lambda_function_url" "url_update_account" {
   function_name      = aws_lambda_function.update_account_lambda.function_name
+  authorization_type = "NONE"
+
+  cors {
+    allow_credentials = true
+    allow_origins     = ["*"]
+    allow_methods     = ["PUT"]
+    allow_headers     = ["*"]
+    expose_headers    = ["keep-alive", "date"]
+  }
+}
+
+resource "aws_lambda_function_url" "url_request_item" {
+  function_name      = aws_lambda_function.request_item_lambda.function_name
   authorization_type = "NONE"
 
   cors {

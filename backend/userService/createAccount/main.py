@@ -4,7 +4,6 @@ import uuid
 import traceback
 
 
-
 def handler(event, context, table=None):
     # pass in table for testing
     if table is None:
@@ -12,6 +11,7 @@ def handler(event, context, table=None):
         table = dynamodb_resource.Table("users-30144999")  
 
     data = json.loads(event["body"])
+
     try:
         item={
             "userID": str(uuid.uuid4()),

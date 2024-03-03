@@ -23,9 +23,34 @@ def items_table(dynamodb_mock):
     """Create a mock DynamoDB table."""
     table = dynamodb_mock.create_table(
         TableName='items-30144999',
-        KeySchema=[{'AttributeName': 'itemID', 'KeyType': 'HASH'}],
-        AttributeDefinitions=[{'AttributeName': 'itemID', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
+        KeySchema=[
+            {'AttributeName': 'itemID', 'KeyType': 'HASH'},
+        ],
+        AttributeDefinitions=[
+            {'AttributeName': 'location', 'AttributeType': 'S'},
+            {'AttributeName': 'timestamp', 'AttributeType': 'N'},
+            {'AttributeName': 'itemID', 'AttributeType': 'S'}
+        ],
+        ProvisionedThroughput={
+            'ReadCapacityUnits': 1,
+            'WriteCapacityUnits': 1
+        },
+        GlobalSecondaryIndexes=[
+            {
+                'IndexName': 'LocationTimestampIndex',
+                'KeySchema': [
+                    {'AttributeName': 'location', 'KeyType': 'HASH'},
+                    {'AttributeName': 'timestamp', 'KeyType': 'RANGE'} 
+                ],
+                'Projection': {
+                    'ProjectionType': 'ALL'
+                },
+                'ProvisionedThroughput': {
+                    'ReadCapacityUnits': 1,
+                    'WriteCapacityUnits': 1
+                }
+            }
+        ]
     )
     return table
 
@@ -45,7 +70,7 @@ def test_handler_with_lastItemID(dynamodb_mock, items_table):
     items_table.put_item(Item={'itemID': '1'})
     items_table.put_item(Item={'itemID': '2'})
     event = {
-        'body': json.dumps({'lastItemID': '1', 'pageCount': 1})
+        'headers': {'lastItemID': '1', 'pagecount': 1}
     }
     response = handler(event, None)
     assert response['statusCode'] == 200
@@ -57,7 +82,7 @@ def test_handler_no_lastItemID(dynamodb_mock, items_table):
     items_table.put_item(Item={'itemID': '1'})
     items_table.put_item(Item={'itemID': '2'})
     event = {
-        'body': json.dumps({'pageCount': 2})
+        'headers': {'pagecount': 2}
     }
     response = handler(event, None)
     assert response['statusCode'] == 200

@@ -26,22 +26,86 @@ def dynamodb_mock(aws_credentials):
     with mock_aws():
         yield boto3.resource('dynamodb', region_name='ca-central-1')
 
-def test_update_item_in_table(dynamodb_mock):
-    table_name = "items-30144999"
-    dynamodb_mock.create_table(
-        TableName=table_name,
-        KeySchema=[{'AttributeName': 'itemID', 'KeyType': 'HASH'}],
-        AttributeDefinitions=[{'AttributeName': 'itemID', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
+@pytest.fixture
+def items_table(dynamodb_mock):
+    """Create a mock DynamoDB table."""
+    table = dynamodb_mock.create_table(
+        TableName='items-30144999',
+        KeySchema=[
+            {'AttributeName': 'itemID', 'KeyType': 'HASH'},
+        ],
+        AttributeDefinitions=[
+            {'AttributeName': 'location', 'AttributeType': 'S'},
+            {'AttributeName': 'timestamp', 'AttributeType': 'N'},
+            {'AttributeName': 'itemID', 'AttributeType': 'S'}
+        ],
+        ProvisionedThroughput={
+            'ReadCapacityUnits': 1,
+            'WriteCapacityUnits': 1
+        },
+        GlobalSecondaryIndexes=[
+            {
+                'IndexName': 'LocationTimestampIndex',
+                'KeySchema': [
+                    {'AttributeName': 'location', 'KeyType': 'HASH'},
+                    {'AttributeName': 'timestamp', 'KeyType': 'RANGE'} 
+                ],
+                'Projection': {
+                    'ProjectionType': 'ALL'
+                },
+                'ProvisionedThroughput': {
+                    'ReadCapacityUnits': 1,
+                    'WriteCapacityUnits': 1
+                }
+            }
+        ]
     )
+    return table
 
-    table = dynamodb_mock.Table(table_name)
 
-    # Act: Update item in table using the function
-    itemID = "1"
-    borrowerID = "12345"
-    response = update_item_in_table(table, itemID, borrowerID)
+def test_update_item_in_table(items_table):
+    items_table.put_item(
+        Item={
+            'itemID': '1',
+            'borrowerID': None,
+            'timestamp': 1234567890,
+            'location': 'Vancouver',
 
-    # Assert: Check if the item was updated successfully
-    updated_item = table.get_item(Key={'itemID': itemID})
-    assert updated_item['Item']['borrowerID'] == borrowerID, "The borrowerID should be updated to 12345."
+        }
+    )
+    update_item_in_table(items_table, '1', 'JX152')
+    response = items_table.get_item(
+        Key={'itemID': '1'}
+    )
+    assert response['Item']['borrowerID'] == 'JX152', "Should update the borrowerID in the table."
+
+def test_remove_borrower_id_from_borrow_requests(items_table):
+    items_table.put_item(
+        Item={
+            'itemID': '1',
+            'borrowRequests': ['JX152', 'JX153'],
+            'timestamp': 1234567890,
+            'location': 'Vancouver',
+        }
+    )
+    remove_borrower_id_from_borrow_requests(items_table, '1', 0)
+    response = items_table.get_item(
+        Key={'itemID': '1'}
+    )
+    assert response['Item']['borrowRequests'] == ['JX153'], "Should remove the borrowerID from the borrowRequests array in the table."
+
+def test_handler_with_valid_borrowerID(items_table):
+    items_table.put_item(
+        Item={
+            'itemID': '1',
+            'borrowRequests': ['JX152', 'JX153'],
+            'timestamp': 1234567890,
+            'location': 'Vancouver',
+        }
+    )
+    event = {
+        "body": '{"itemID": "1", "borrowerID": "JX152"}'
+    }
+    response = handler(event, None)
+    assert response['statusCode'] == 200, "Should return a 200 status code."
+    assert json.loads(response['body'])['Attributes']['borrowRequests'] == ['JX153'], "Should remove the borrowerID from the borrowRequests array in the table."

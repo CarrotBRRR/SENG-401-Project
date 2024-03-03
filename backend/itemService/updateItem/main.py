@@ -16,23 +16,11 @@ def parse_event_body(event_body):
         return json.loads(event_body)
     return event_body
 
-# This is probably wrong?
-def update_item_in_table(table, itemID, newInfo):
+def update_item_in_table(table, newData):
     """Update an item in the DynamoDB table."""
-    response = table.update_item(
-        Key={
-            'itemID': itemID
-        },
-        UpdateExpression="set itemName = :itemName, set description = :description, \
-        set maxBorrowDays = :maxBorrowDays, set imageURL = :imageURL, set imageHash = :imageHash",
-        ExpressionAttributeValues={
-            ':itemName': newInfo["itemName"],
-            ':description': newInfo["description"],
-            ':maxBorrowDays': newInfo["maxBorrowDays"],
-            ':imageURL': newInfo["image_url"],
-            ':imageHash': newInfo["image_hash"]
-        },
-        ReturnValues="UPDATED_NEW"
+    response = table.put_item(
+        Item=newData,
+        ReturnValues='ALL_OLD'
     )
     return response
 
@@ -89,37 +77,69 @@ def create_query_string(dict):
 
 def handler(event, context):
     try:
+        # Get the table and retrieve the old values
         table_name = 'items-30144999'
         table = get_dynamodb_table(table_name)
+        item = table.get_item(Key={"itemID": itemID})["Item"]
+        
+        old_image_hashes = item["imageHashes"]
+        timestamp = item["timestamp"]
+        lenderID = item["lenderID"]
+
+        # Parse the event body
         body = parse_event_body(event["body"])
-    
         itemID = body["itemID"]
+
+        # Get the new values
         itemName = body["name"]
         description = body["description"]
-        maxBorrowDays = body["max_borrow_days"]
+        condition = body["condition"]
+        location = body["location"]
+        tags = body["tags"]
 
-        raw_image = body["image"]
-        image_bytes = base64.b64decode(raw_image)
-        new_image_hash = hashlib.sha256(image_bytes).hexdigest()
-        old_image_hash = table.get_item(Key={"itemID": itemID})["Item"]["imageHash"]
-        
-        if(new_image_hash != old_image_hash):
-            response = post_image(image_bytes)
-            image_url = response["secure_url"]
-            image_hash = new_image_hash
-        else:
-            image_url = table.get_item(Key={"itemID": itemID})["Item"]["imageURL"]
-            image_hash = old_image_hash
+        # Get the image and hashes
+        raw_images = body["images"]
+        image_urls = []
+        image_hashes = []
+        for raw_image in raw_images:
+            image_bytes = base64.b64decode(raw_image)
+            new_image_hash = hashlib.sha256(image_bytes).hexdigest()
+            
+            # If the image has changed, upload it to Cloudinary, and update the image URL and hash
+            if new_image_hash not in old_image_hashes:
+                response = post_image(image_bytes)
+                image_url = response["secure_url"]
+                image_hash = new_image_hash
+                
+            # If the image has not changed, use the old image URL and hash
+            else:
+                image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
+                image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
 
+                i = old_image_hashes.index(new_image_hash)
+                image_hash = old_image_hashes[i]
+
+            image_urls.append(image_url)
+            image_hashes.append(image_hash)
+
+        # Create a new item object
         newInfo = {
+            'itemID': itemID,
             'itemName': itemName,
+            'condition': condition,
             'description': description,
-            'maxBorrowDays': maxBorrowDays,
-            'image_url': image_url,
-            'image_hash': image_hash
+            'tags': tags,
+            'location': location,
+            'images': image_urls,
+            'imageHashes': image_hashes,
+            'lenderID': lenderID,
+            'timestamp': timestamp,
+            'borrowerID': None
         }
 
-        response = update_item_in_table(table, itemID, newInfo)
+
+        # Update the item in the table
+        response = update_item_in_table(table, newInfo)
         
         return {
             'statusCode': 200,
