@@ -11,7 +11,7 @@ def handler(event, context, table=None):
         dynamodb_resource = boto3.resource("dynamodb", region_name='ca-central-1')
         table = dynamodb_resource.Table("users-30144999")  
 
-    data = event["body"]
+    data = json.loads(event["body"])
     try:
         item={
             "userID": str(uuid.uuid4()),
