@@ -1,5 +1,5 @@
 import React from "react";
-
+import DatepickerRentalForm from "./DatepickerRentalForm";
 export default function RequestRentalForm() {
   return (
     <>
@@ -13,14 +13,13 @@ export default function RequestRentalForm() {
             >
               Return Date *
             </label>
-            <div className="w-full p-2 bg-stone-50 rounded border border-zinc-300 justify-start items-center">
-              <input
+            <DatepickerRentalForm></DatepickerRentalForm>
+            {/* <input
                 type="date"
                 id="return-date"
                 className="block w-full text-sm text-neutral-500 bg-transparent border-gray-300 dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600"
                 required
-              />
-            </div>
+              /> */}
           </div>
           <div className="w-full">
             <label

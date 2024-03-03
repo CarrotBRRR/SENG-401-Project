@@ -13,20 +13,20 @@ def parse_event_body(event_body):
         return json.loads(event_body)
     return event_body
 
-def update_borrowerID_to_null_in_item(table, itemID):
-    """Set the borrowerID to null for an item in the DynamoDB table."""
+def append_borrower_to_borrow_requests(table, itemID, borrowerID):
+    """Append a borrowerID to the borrowRequests array in the DynamoDB table."""
     response = table.update_item(
         Key={
             'itemID': itemID
         },
-        UpdateExpression="SET borrowerID = :val",
+        UpdateExpression="SET borrowRequests = list_append(if_not_exists(borrowRequests, :empty_list), :b)",
         ExpressionAttributeValues={
-            ':val': None
+            ':b': [borrowerID],
+            ':empty_list': []
         },
         ReturnValues="UPDATED_NEW"
     )
     return response
-
 
 def handler(event, context):
     try:
@@ -34,17 +34,21 @@ def handler(event, context):
         table = get_dynamodb_table(table_name)
         body = parse_event_body(event["body"])
         itemID = body["itemID"]
+        borrowerID = body["borrowerID"]
         
-        response = update_borrowerID_to_null_in_item(table, itemID)
-        
+        response = append_borrower_to_borrow_requests(table, itemID, borrowerID)
         
         return {
             'statusCode': 200,
-            'body': json.dumps(response)
+            'body': json.dumps({
+                'message': 'BorrowerID appended successfully',
+                'updatedAttributes': response['Attributes']
+            })
         }
     except Exception as e:
         return {
             'statusCode': 500,
-            'body': json.dumps(str(e))
+            'body': json.dumps({
+                'error': str(e)
+            })
         }
-

@@ -4,6 +4,7 @@ import json
 import uuid
 import hashlib
 import base64
+import time
 
 def get_dynamodb_table(table_name):
     """Initialize a DynamoDB resource and get the table."""
@@ -17,9 +18,8 @@ def parse_event_body(event_body):
         return json.loads(event_body)
     return event_body
 
-def insert_item_in_table(table, itemID, data):
+def insert_item_in_table(table, data):
     """Insert an item into the DynamoDB table."""
-    
     response = table.put_item(
         Item=data,
         ReturnValues='ALL_OLD'
@@ -41,6 +41,7 @@ def post_image(image):
     api_key = keys[1]
     api_secret = keys[2]
 
+    # Set up the URL
     url = f'https://api.cloudinary.com/v1_1/{cloud_name}/image/upload/'
 
     # Set up the payload
@@ -50,7 +51,11 @@ def post_image(image):
     file = {
         'file': image
     }
+
+    # Create a signature and add it to the payload
     payload["signature"] = create_signature(payload, api_secret)
+
+    # Post the image to Cloudinary
     res = requests.post(url, files=file, data=payload)
     return res.json()
 
@@ -79,37 +84,59 @@ def create_query_string(dict):
 
 def handler(event, context):
     try:
+        # Parse the event body
         body = parse_event_body(event["body"])
 
         lenderID = body['lenderID']
-        itemName = body['name']
+        itemName = body['listingTitle']
         description = body['description']
-        maxBorrowDays = body['max_borrow_days']
+        condition = body['condition']
+        location = body['location']
+        tags = body['tags']
 
         # Create a unique item ID
         itemID = str(uuid.uuid4())
 
-        raw_image = body['image']
-        image_bytes = base64.b64decode(raw_image)
-        image_hash = hashlib.sha256(image_bytes).hexdigest()
-        filename = "./tmp/img.png"
-        with open(filename, "wb") as f:
-            f.write(image_bytes)
+        # Image handling
+        raw_images = body['images']
+        image_urls = []
+        image_hashes = []
+        for raw_image in raw_images:
+            # Decode the image and hash it
+            image_bytes = base64.b64decode(raw_image)
+            image_hash = hashlib.sha256(image_bytes).hexdigest()
 
-        image_url = post_image(filename)["secure_url"]
+            # Save the image to a temp file
+            filename = "./tmp/img.png"
+            with open(filename, "wb") as f:
+                f.write(image_bytes)
 
+            # Upload the image to Cloudinary
+            image_urls.append(post_image(filename)["secure_url"])
+            image_hashes.append(image_hash)
+
+        # Get the current time
+        time = str(int(time.time()))
+
+        # Prepare the data to be inserted into the table
         data = {
-            'lenderID': lenderID,
+            'itemID': itemID,
             'itemName': itemName,
+            'condition': condition,
             'description': description,
-            'maxBorrowDays': maxBorrowDays,
-            'image': image_url,
-            'imageHash': image_hash
+            'tags': tags,
+            'location': location,
+            'images': image_urls,
+            'imageHashes': image_hashes,
+            'lenderID': lenderID,
+            'timestamp': time,
+            'borrowerID': None
         }
 
+        # Insert the item into the table
         table_name = 'items-30144999'
         table = get_dynamodb_table(table_name)
-        response = insert_item_in_table(table, itemID, data)
+        response = insert_item_in_table(table, data)
 
         return {
             'statusCode': 200,

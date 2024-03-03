@@ -2,9 +2,15 @@ import pytest
 from main import *
 from moto import mock_aws
 import boto3
-from decimal import Decimal
 
+def test_parse_event_body_with_dict():
+    event_body = {"key": "value"}
+    assert parse_event_body(event_body) == event_body, "Should return the original dictionary without changes."
 
+def test_parse_event_body_with_json_string():
+    event_body = '{"key": "value"}'
+    expected_result = {"key": "value"}
+    assert parse_event_body(event_body) == expected_result, "Should convert JSON string to dictionary."
 
 @pytest.fixture
 def aws_credentials():
@@ -56,22 +62,33 @@ def items_table(dynamodb_mock):
     )
     return table
 
+def test_append_borrower_to_borrow_requests(items_table):
+    items_table.put_item(
+        Item={
+            'itemID': '1',
+            'borrowRequests': [],
+            'timestamp': 123,
+            'location': 'Toronto'
+        }
+    )
+    
+    append_borrower_to_borrow_requests(items_table, '1', 'AGJKL')
+    response = items_table.get_item(Key={'itemID': '1'})
+    assert response['Item']['borrowRequests'] == ['AGJKL'], "Should append a borrowerID to the borrowRequests array."
 
-def test_remove_item(items_table):
-    items_table.put_item(Item={'itemID': '1', 'location': 'Los Angeles', 'timestamp': Decimal('123')})
-    items_table.put_item(Item={'itemID': '2', 'location': 'Los Angeles', 'timestamp': Decimal('123.1')})
-
-    remove_item(items_table, '1')
-    response = items_table.scan()
-    items = response['Items']
-    assert len(items) == 1
-    assert items[0]['itemID'] == '2'
-
-    remove_item(items_table, '2')
-    response = items_table.scan()
-    items = response['Items']
-    assert len(items) == 0
-
-
-
-
+def test_handler_success(items_table):
+    items_table.put_item(
+        Item={
+            'itemID': '1',
+            'borrowRequests': ["JX152"],
+            'timestamp': 123,
+            'location': 'Toronto'
+        }
+    )
+    event = {
+        "body": '{"itemID": "1", "borrowerID": "AGJKL"}'
+    }
+    context = None
+    response = handler(event, context)
+    assert response['statusCode'] == 200, "Should return a 200 status code."
+    assert json.loads(response['body'])['updatedAttributes']['borrowRequests'] == ['JX152','AGJKL'], "Should append a borrowerID to the borrowRequests array."

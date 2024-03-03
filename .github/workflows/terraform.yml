@@ -129,6 +129,16 @@ jobs:
           cd ./backend/userService/updateAccount
           zip -r ../../../infra/updateAccount.zip .
           cd -
+      
+      - name: Install Python dependencies requestItem
+        run: |
+          pip3 install -r ./backend/itemService/requestItem/requirements.txt -t ./backend/itemService/requestItem/
+
+      - name: Zip create requestItem function
+        run: |
+          cd ./backend/itemService/requestItem
+          zip -r ../../../infra/requestItem.zip .
+          cd -
 
       
       - name: Terraform Init and Apply

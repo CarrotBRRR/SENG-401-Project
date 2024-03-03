@@ -18,10 +18,12 @@ jobs:
           - './backend/itemService/getItem/'
           - './backend/itemService/returnItem/'
           - './backend/itemService/updateItem/'
+          - './backend/itemService/requestItem/'
           - './backend/userService/createAccount/'
           - './backend/userService/deleteAccount/'
           - './backend/userService/getAccount/'
           - './backend/userService/updateAccount/'
+
       fail-fast: false
 
 
