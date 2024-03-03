@@ -139,6 +139,16 @@ jobs:
           cd ./backend/itemService/requestItem
           zip -r ../../../infra/requestItem.zip .
           cd -
+      
+      - name: Install Python dependencies getLenderItems
+        run: |
+          pip3 install -r ./backend/itemService/getLenderItems/requirements.txt -t ./backend/itemService/getLenderItems/
+
+      - name: Zip create getLenderItems function
+        run: |
+          cd ./backend/itemService/getLenderItems
+          zip -r ../../../infra/getLenderItems.zip .
+          cd -
 
       
       - name: Terraform Init and Apply

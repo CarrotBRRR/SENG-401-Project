@@ -19,6 +19,7 @@ jobs:
           - './backend/itemService/returnItem/'
           - './backend/itemService/updateItem/'
           - './backend/itemService/requestItem/'
+          - './backend/itemService/getLenderItems/'
           - './backend/userService/createAccount/'
           - './backend/userService/deleteAccount/'
           - './backend/userService/getAccount/'
