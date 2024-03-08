@@ -274,6 +274,15 @@ resource "aws_dynamodb_table" "users_dynamodb_table" {
     type = "S"
   }
 
+  global_secondary_index {
+    name               = "EmailIndex"
+    hash_key           = "email"
+    range_key          = "userID"
+    projection_type    = "ALL"
+    read_capacity      = 1
+    write_capacity     = 1
+  }
+
 }
 
 resource "aws_iam_policy" "dynamodb_policy" {
