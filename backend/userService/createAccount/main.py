@@ -13,9 +13,11 @@ def handler(event, context, table=None):
     data = json.loads(event["body"])
 
     try:
-        # check if email already exists
-        response = table.get_item(Key={'email': data["email"]})
-        if 'Item' in response:
+        response = table.scan(
+            FilterExpression=boto3.dynamodb.conditions.Attr("email").eq(data["email"])
+        )
+        
+        if response["Count"] > 0:
             return {
                 "statusCode": 400,
                 "body": json.dumps({
