@@ -13,6 +13,16 @@ def handler(event, context, table=None):
     data = json.loads(event["body"])
 
     try:
+        # check if email already exists
+        response = table.get_item(Key={'email': data["email"]})
+        if 'Item' in response:
+            return {
+                "statusCode": 400,
+                "body": json.dumps({
+                    "message": "Email already exists"
+                })
+            }
+        
         item={
             "userID": str(uuid.uuid4()),
             "name": data["name"],
