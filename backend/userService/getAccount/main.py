@@ -13,7 +13,7 @@ def handler(event, context, table=None):
     data = json.loads(event["body"])
     
     # check if request contains userID or email
-    if "userID" not in data or "email" not in data:
+    if "userID" not in data and "email" not in data:
         return {
             "statusCode": 400,
             "body": json.dumps({
