@@ -23,7 +23,16 @@ def test_write_user_into_table(dynamodb_mock):
     dynamodb_mock.create_table(
         TableName = table_name, 
         KeySchema = [{'AttributeName': 'userID', 'KeyType': 'HASH'}],
-        AttributeDefinitions = [{'AttributeName': 'userID', 'AttributeType': 'S'}],     
+        AttributeDefinitions = [
+            {'AttributeName': 'userID', 'AttributeType': 'S'},
+            {'AttributeName': 'email', 'AttributeType': 'S'}
+        ],
+        GlobalSecondaryIndexes=[{
+            'IndexName': 'EmailIndex',
+            'KeySchema': [{'AttributeName': 'email', 'KeyType': 'HASH'}],
+            'Projection': {'ProjectionType': 'ALL'},
+            'ProvisionedThroughput': {'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
+        }],     
         ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
     )
 
