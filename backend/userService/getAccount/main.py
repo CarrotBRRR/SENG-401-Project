@@ -13,11 +13,7 @@ def handler(event, context, table=None):
     data = json.loads(event["body"])
     
     # check if request contains userID or email
-    if "userID" in data:
-        key_condition = Key("userID").eq(data["userID"])
-    elif "email" in data:
-        key_condition = Key("email").eq(data["email"])
-    else:
+    if "userID" not in data and "email" not in data:
         return {
             "statusCode": 400,
             "body": json.dumps({
@@ -26,7 +22,15 @@ def handler(event, context, table=None):
         }
     
     try:
-        res = table.query(KeyConditionExpression=key_condition)
+        # use gsi for email if request contains email
+        if "email" in data:
+            res = table.query(
+                IndexName='EmailIndex',
+                KeyConditionExpression=Key("email").eq(data["email"])
+            )
+        else:
+            res = table.query(KeyConditionExpression=Key("userID").eq(data["userID"]))
+        
         items = res["Items"]
 
         if not items:
