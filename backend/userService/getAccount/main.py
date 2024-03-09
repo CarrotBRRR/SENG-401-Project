@@ -4,11 +4,12 @@ import boto3
 from decimal import Decimal
 
 
-
 def handler(event, context, table=None):
+    # pass in table for testing
     if table is None:
         dynamodb_resource = boto3.resource("dynamodb", region_name='ca-central-1')
         table = dynamodb_resource.Table("users-30144999")  
+    
     data = json.loads(event["body"])
     
     # check if request contains userID or email
@@ -27,6 +28,14 @@ def handler(event, context, table=None):
     try:
         res = table.query(KeyConditionExpression=key_condition)
         items = res["Items"]
+
+        if not items:
+            return {
+                "statusCode": 404,
+                "body": json.dumps({
+                    "message": "User not found"
+                })
+            }
         
         # convert decimal to floats for JSON serialization
         for item in items:
