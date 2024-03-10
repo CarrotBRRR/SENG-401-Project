@@ -14,19 +14,44 @@ def aws_credentials():
 @pytest.fixture
 def dynamodb_mock(aws_credentials):
     with mock_aws():
-        yield
+        yield boto3.resource('dynamodb', region_name='ca-central-1')
+
 
 @pytest.fixture
-def dynamodb_table(dynamodb_mock):
+def items_table(dynamodb_mock):
     """Create a mock DynamoDB table."""
-    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-    dynamodb.create_table(
+    table = dynamodb_mock.create_table(
         TableName='items-30144999',
-        KeySchema=[{'AttributeName': 'itemID', 'KeyType': 'HASH'}],
-        AttributeDefinitions=[{'AttributeName': 'itemID', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
+        KeySchema=[
+            {'AttributeName': 'itemID', 'KeyType': 'HASH'},
+        ],
+        AttributeDefinitions=[
+            {'AttributeName': 'location', 'AttributeType': 'S'},
+            {'AttributeName': 'timestamp', 'AttributeType': 'N'},
+            {'AttributeName': 'itemID', 'AttributeType': 'S'}
+        ],
+        ProvisionedThroughput={
+            'ReadCapacityUnits': 1,
+            'WriteCapacityUnits': 1
+        },
+        GlobalSecondaryIndexes=[
+            {
+                'IndexName': 'LocationTimestampIndex',
+                'KeySchema': [
+                    {'AttributeName': 'location', 'KeyType': 'HASH'},
+                    {'AttributeName': 'timestamp', 'KeyType': 'RANGE'} 
+                ],
+                'Projection': {
+                    'ProjectionType': 'ALL'
+                },
+                'ProvisionedThroughput': {
+                    'ReadCapacityUnits': 1,
+                    'WriteCapacityUnits': 1
+                }
+            }
+        ]
     )
-    return dynamodb.Table('items-30144999')
+    return table
 
 def test_parse_event_body_with_dict():
     event_body = {"key": "value"}
@@ -37,19 +62,31 @@ def test_parse_event_body_with_json_string():
     expected_result = {"key": "value"}
     assert parse_event_body(event_body) == expected_result
 
-def test_remove_borrowerID_from_item(dynamodb_table):
-    # Prepopulate the table with an item
-    itemID = '1'
-    dynamodb_table.put_item(Item={'itemID': itemID, 'borrowerID': '12345'})
+def test_remove_borrowerID_from_item(items_table):
+    item = {
+        'itemID': '1',
+        'location': 'Vancouver',
+        'timestamp': 123456789,
+        'borrowerID': 'user1'
+    }
+    table = items_table
+    table.put_item(Item=item)
+    response = remove_borrowerID_from_item(table, '1')
+    assert response['Attributes'].get('borrowerID') == None
 
-    # Perform the remove operation
-    update_borrowerID_to_null_in_item(dynamodb_table, itemID)
-
-    # Fetch the updated item
-    response = dynamodb_table.get_item(Key={'itemID': itemID})
-    assert 'Item' in response
-    item = response['Item']
-    # Assert that the borrowerID is now null for itemID 1
-    assert item['borrowerID'] is None
-
+def test_handler(items_table):
+    item = {
+        'itemID': '1',
+        'location': 'Vancouver',
+        'timestamp': 123456789,
+        'borrowerID': 'user1'
+    }
+    table = items_table
+    table.put_item(Item=item)
+    event = {
+        'body': '{"itemID": "1"}'
+    }
+    response = handler(event, None)
+    assert response['statusCode'] == 200
+    assert json.loads(response['body'])['Attributes'].get('borrowerID') == None
 

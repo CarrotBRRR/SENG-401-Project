@@ -1,10 +1,8 @@
 import boto3
 import requests
 import json
-import uuid
 import hashlib
 import base64
-import time
 
 def get_dynamodb_table(table_name):
     """Initialize a DynamoDB resource and get the table."""
@@ -18,10 +16,10 @@ def parse_event_body(event_body):
         return json.loads(event_body)
     return event_body
 
-def insert_item_in_table(table, data):
-    """Insert an item into the DynamoDB table."""
+def update_item_in_table(table, newData):
+    """Update an item in the DynamoDB table."""
     response = table.put_item(
-        Item=data,
+        Item=newData,
         ReturnValues='ALL_OLD'
     )
     return response
@@ -41,7 +39,6 @@ def post_image(image):
     api_key = keys[1]
     api_secret = keys[2]
 
-    # Set up the URL
     url = f'https://api.cloudinary.com/v1_1/{cloud_name}/image/upload/'
 
     # Set up the payload
@@ -51,11 +48,7 @@ def post_image(image):
     file = {
         'file': image
     }
-
-    # Create a signature and add it to the payload
     payload["signature"] = create_signature(payload, api_secret)
-
-    # Post the image to Cloudinary
     res = requests.post(url, files=file, data=payload)
     return res.json()
 
@@ -84,62 +77,84 @@ def create_query_string(dict):
 
 def handler(event, context):
     try:
+        # Get the table and retrieve the old values
+        table_name = 'items-30144999'
+        table = get_dynamodb_table(table_name)
+        item = table.get_item(Key={"itemID": itemID})["Item"]
+        
+        if item is None:
+            return {
+                'statusCode': 404,
+                'body': json.dumps("Item not found")
+            }
+
+        old_image_hashes = item["imageHashes"]
+        timestamp = item["timestamp"]
+        lenderID = item["lenderID"]
+
         # Parse the event body
         body = parse_event_body(event["body"])
+        itemID = body["itemID"]
 
-        lenderID = body['lenderID']
-        itemName = body['name']
-        description = body['description']
-        maxBorrowDays = body['max_borrow_days']
+        # Get the new values
+        itemName = body["name"]
+        description = body["description"]
+        condition = body["condition"]
+        location = body["location"]
+        category = body["category"]
 
-        # Create a unique item ID
-        itemID = str(uuid.uuid4())
-
-        # Image handling
-        raw_images = body['images']
+        # Get the image and hashes
+        raw_images = body["images"]
         image_urls = []
         image_hashes = []
         for raw_image in raw_images:
-            # Decode the image and hash it
             image_bytes = base64.b64decode(raw_image)
-            image_hash = hashlib.sha256(image_bytes).hexdigest()
+            new_image_hash = hashlib.sha256(image_bytes).hexdigest()
+            
+            # If the image has changed, upload it to Cloudinary, and update the image URL and hash
+            if new_image_hash not in old_image_hashes:
+                response = post_image(image_bytes)
+                image_url = response["secure_url"]
+                image_hash = new_image_hash
+                
+            # If the image has not changed, use the old image URL and hash
+            else:
+                image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
+                image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
 
-            # Save the image to a temp file
-            filename = "./tmp/img.png"
-            with open(filename, "wb") as f:
-                f.write(image_bytes)
+                i = old_image_hashes.index(new_image_hash)
+                image_hash = old_image_hashes[i]
 
-            # Upload the image to Cloudinary
-            image_urls.append(post_image(filename)["secure_url"])
+            image_urls.append(image_url)
             image_hashes.append(image_hash)
 
-        # Get the current time
-        time = str(int(time.time()))
-
-        # Prepare the data to be inserted into the table
-        data = {
+        # Create a new item object
+        newInfo = {
             'itemID': itemID,
-            'lenderID': lenderID,
             'itemName': itemName,
+            'condition': condition,
             'description': description,
-            'image': image_urls,
-            'imageHash': image_hashes,
-            'timestamp': time,
+            'category': category,
+            'location': location,
+            'images': image_urls,
+            'imageHashes': image_hashes,
+            'lenderID': lenderID,
+            'timestamp': timestamp,
             'borrowerID': None
         }
 
-        # Insert the item into the table
-        table_name = 'items-30144999'
-        table = get_dynamodb_table(table_name)
-        response = insert_item_in_table(table, data)
 
+        # Update the item in the table
+        response = update_item_in_table(table, newInfo)
+        
         return {
             'statusCode': 200,
             'body': json.dumps(response)
         }
-    
+
     except Exception as e:
         return {
             'statusCode': 500,
             'body': json.dumps(str(e))
         }
+

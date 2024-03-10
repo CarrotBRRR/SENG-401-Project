@@ -62,49 +62,33 @@ def items_table(dynamodb_mock):
     )
     return table
 
-
-def test_update_item_in_table(items_table):
+def test_append_borrower_to_borrow_requests(items_table):
     items_table.put_item(
         Item={
             'itemID': '1',
-            'timestamp': 1234567890,
-            'location': 'Vancouver',
-
+            'borrowRequests': [],
+            'timestamp': 123,
+            'location': 'Toronto'
         }
     )
-    update_item_in_table(items_table, '1', 'JX152')
-    response = items_table.get_item(
-        Key={'itemID': '1'}
-    )
-    assert response['Item']['borrowerID'] == 'JX152', "Should update the borrowerID in the table."
+    
+    append_borrower_to_borrow_requests(items_table, '1', 'AGJKL')
+    response = items_table.get_item(Key={'itemID': '1'})
+    assert response['Item']['borrowRequests'] == ['AGJKL'], "Should append a borrowerID to the borrowRequests array."
 
-def test_remove_borrower_id_from_borrow_requests(items_table):
+def test_handler_success(items_table):
     items_table.put_item(
         Item={
             'itemID': '1',
-            'borrowRequests': ['JX152', 'JX153'],
-            'timestamp': 1234567890,
-            'location': 'Vancouver',
-        }
-    )
-    remove_borrower_id_from_borrow_requests(items_table, '1', 0)
-    response = items_table.get_item(
-        Key={'itemID': '1'}
-    )
-    assert response['Item']['borrowRequests'] == ['JX153'], "Should remove the borrowerID from the borrowRequests array in the table."
-
-def test_handler_with_valid_borrowerID(items_table):
-    items_table.put_item(
-        Item={
-            'itemID': '1',
-            'borrowRequests': ['JX152', 'JX153'],
-            'timestamp': 1234567890,
-            'location': 'Vancouver',
+            'borrowRequests': ["JX152"],
+            'timestamp': 123,
+            'location': 'Toronto'
         }
     )
     event = {
-        "body": '{"itemID": "1", "borrowerID": "JX152"}'
+        "body": '{"itemID": "1", "borrowerID": "AGJKL"}'
     }
-    response = handler(event, None)
+    context = None
+    response = handler(event, context)
     assert response['statusCode'] == 200, "Should return a 200 status code."
-    assert json.loads(response['body'])['Attributes']['borrowRequests'] == ['JX153'], "Should remove the borrowerID from the borrowRequests array in the table."
+    assert json.loads(response['body'])['updatedAttributes']['borrowRequests'] == ['JX152','AGJKL'], "Should append a borrowerID to the borrowRequests array."

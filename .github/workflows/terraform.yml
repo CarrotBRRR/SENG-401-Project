@@ -59,14 +59,14 @@ jobs:
           zip -r ../../../infra/deleteItem.zip .
           cd -
       
-      - name: Install Python dependencies getItem
+      - name: Install Python dependencies getItemPage
         run: |
-          pip3 install -r ./backend/itemService/getItem/requirements.txt -t ./backend/itemService/getItem/
+          pip3 install -r ./backend/itemService/getItemPage/requirements.txt -t ./backend/itemService/getItemPage/
         
-      - name: Zip create getItem function
+      - name: Zip create getItemPage function
         run: |
-          cd ./backend/itemService/getItem
-          zip -r ../../../infra/getItem.zip .
+          cd ./backend/itemService/getItemPage
+          zip -r ../../../infra/getItemPage.zip .
           cd -
       
       - name: Install Python dependencies returnItem
@@ -129,7 +129,36 @@ jobs:
           cd ./backend/userService/updateAccount
           zip -r ../../../infra/updateAccount.zip .
           cd -
+      
+      - name: Install Python dependencies requestItem
+        run: |
+          pip3 install -r ./backend/itemService/requestItem/requirements.txt -t ./backend/itemService/requestItem/
 
+      - name: Zip create requestItem function
+        run: |
+          cd ./backend/itemService/requestItem
+          zip -r ../../../infra/requestItem.zip .
+          cd -
+      
+      - name: Install Python dependencies getLenderItems
+        run: |
+          pip3 install -r ./backend/itemService/getLenderItems/requirements.txt -t ./backend/itemService/getLenderItems/
+
+      - name: Zip create getLenderItems function
+        run: |
+          cd ./backend/itemService/getLenderItems
+          zip -r ../../../infra/getLenderItems.zip .
+          cd -
+          
+      - name: Install Python dependencies getBorrowedItems
+        run: |
+          pip3 install -r ./backend/itemService/getBorrowedItems/requirements.txt -t ./backend/itemService/getBorrowedItems/
+        
+      - name: Zip create getBorrowedItems function
+        run: |
+          cd ./backend/itemService/getBorrowedItems
+          zip -r ../../../infra/getBorrowedItems.zip .
+          cd -
       
       - name: Terraform Init and Apply
         run: |

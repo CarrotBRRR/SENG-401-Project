@@ -1,5 +1,5 @@
 from moto import mock_aws
-from main import *
+from update_item import *
 import os
 import pytest
 
@@ -31,9 +31,14 @@ def test_edit_item_in_table(dynamodb_mock):
         'lenderID': 'Len Derr',
         'itemName': 'Eye Temm',
         'itemID': '69420',
+        'condition': 'Used - New',
+        'tags': 'tag1, tag2',
+        'location': 'a location',
         'description': 'a description',
-        'image': 'url.com',
-        'imageHash': 'HAHAHASH'
+        'images': 'url.com',
+        'imageHashes': 'HAHAHASH',
+        'timestamp': '1234567890',
+        'borrowerID': None
     }
 
     table.put_item(Item=mock_item)
@@ -41,14 +46,19 @@ def test_edit_item_in_table(dynamodb_mock):
     setup_item = table.get_item(Key={'itemID': '69420'})
 
     assert setup_item['Item']['itemName'] == "Eye Temm"
-
+    assert setup_item['Item']['timestamp'] == "1234567890"
+    
     mock_update = {
         'itemID': '69420',
         'itemName': 'aight \'em',
+        'condition': 'Used - Good',
         'lenderID': 'Len Derr',
+        'tags': 'tag3, tag4',
+        'location': 'another location',
         'description': 'a new description',
-        'image': ['url2.com', 'url3.com'],
-        'imageHash': ['hashbrown', 'otherthing'],
+        'images': ['url2.com', 'url3.com'],
+        'imageHashes': ['hashbrown', 'otherthing'],
+        'timestamp': '1234567890',
         'borrowerID': None
     }
 
@@ -60,6 +70,10 @@ def test_edit_item_in_table(dynamodb_mock):
 
     assert response['Item']['itemName'] == "aight \'em"
     assert response['Item']['description'] == "a new description"
-    assert response['Item']['image'] == ['url2.com', 'url3.com']
-    assert response['Item']['imageHash'] == ['hashbrown', 'otherthing']
+    assert response['Item']['images'] == ['url2.com', 'url3.com']
+    assert response['Item']['imageHashes'] == ['hashbrown', 'otherthing']
+    assert response['Item']['condition'] == "Used - Good"
+    assert response['Item']['tags'] == "tag3, tag4"
+    assert response['Item']['location'] == "another location"
+    assert response['Item']['timestamp'] == "1234567890"
     assert response['Item']['borrowerID'] == None

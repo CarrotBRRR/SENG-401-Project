@@ -15,13 +15,17 @@ jobs:
           - './backend/itemService/borrowItem/'
           - './backend/itemService/createItem/'
           - './backend/itemService/deleteItem/'
-          - './backend/itemService/getItem/'
+          - './backend/itemService/getItemPage/'
           - './backend/itemService/returnItem/'
           - './backend/itemService/updateItem/'
+          - './backend/itemService/requestItem/'
+          - './backend/itemService/getLenderItems/'
+          - './backend/itemService/getBorrowedItems/'
           - './backend/userService/createAccount/'
           - './backend/userService/deleteAccount/'
           - './backend/userService/getAccount/'
           - './backend/userService/updateAccount/'
+
       fail-fast: false
 
 

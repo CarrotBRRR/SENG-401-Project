@@ -1,6 +1,7 @@
 import json
 import boto3
 import uuid
+import traceback
 
 
 def handler(event, context, table=None):
@@ -10,7 +11,21 @@ def handler(event, context, table=None):
         table = dynamodb_resource.Table("users-30144999")  
 
     data = json.loads(event["body"])
+
     try:
+        # check if email already exists
+        response = table.query(
+            IndexName='EmailIndex',  
+            KeyConditionExpression=boto3.dynamodb.conditions.Key("email").eq(data["email"])
+        )
+        if response["Count"] > 0:
+            return {
+                "statusCode": 400,
+                "body": json.dumps({
+                    "message": "Email already exists"
+                })
+            }
+        # if email doesn't exist, create new user
         item={
             "userID": str(uuid.uuid4()),
             "name": data["name"],
@@ -24,12 +39,21 @@ def handler(event, context, table=None):
             "statusCode": 200,
                 "body": json.dumps(item)
         }
+    except KeyError as ke:
+        return {
+            "statusCode": 400,
+            "body": json.dumps({
+                "message": f"Missing required field: {str(ke)}"
+            })
+        }
     except Exception as e:
         print(f"Exception: {e}")
+        traceback.print_exc()
         return {
             "statusCode": 500,
                 "body": json.dumps({
-                    "message": str(e)
+                    "message": str(e),
+                    "stack_trace": traceback.format_exc()
                 })}
 
 

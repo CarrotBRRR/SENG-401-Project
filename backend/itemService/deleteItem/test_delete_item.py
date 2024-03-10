@@ -2,6 +2,8 @@ import pytest
 from main import *
 from moto import mock_aws
 import boto3
+from decimal import Decimal
+
 
 
 @pytest.fixture
@@ -18,24 +20,58 @@ def dynamodb_mock(aws_credentials):
     with mock_aws():
         yield boto3.resource('dynamodb', region_name='ca-central-1')
 
-
-def test_remove_item(dynamodb_mock):
-    table_name = 'items-30144999'
-    dynamodb_mock.create_table(
-        TableName=table_name,
-        KeySchema=[{'AttributeName': 'itemID', 'KeyType': 'HASH'}],
-        AttributeDefinitions=[{'AttributeName': 'itemID', 'AttributeType': 'S'}],
-        ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
+@pytest.fixture
+def items_table(dynamodb_mock):
+    """Create a mock DynamoDB table."""
+    table = dynamodb_mock.create_table(
+        TableName='items-30144999',
+        KeySchema=[
+            {'AttributeName': 'itemID', 'KeyType': 'HASH'},
+        ],
+        AttributeDefinitions=[
+            {'AttributeName': 'location', 'AttributeType': 'S'},
+            {'AttributeName': 'timestamp', 'AttributeType': 'N'},
+            {'AttributeName': 'itemID', 'AttributeType': 'S'}
+        ],
+        ProvisionedThroughput={
+            'ReadCapacityUnits': 1,
+            'WriteCapacityUnits': 1
+        },
+        GlobalSecondaryIndexes=[
+            {
+                'IndexName': 'LocationTimestampIndex',
+                'KeySchema': [
+                    {'AttributeName': 'location', 'KeyType': 'HASH'},
+                    {'AttributeName': 'timestamp', 'KeyType': 'RANGE'} 
+                ],
+                'Projection': {
+                    'ProjectionType': 'ALL'
+                },
+                'ProvisionedThroughput': {
+                    'ReadCapacityUnits': 1,
+                    'WriteCapacityUnits': 1
+                }
+            }
+        ]
     )
+    return table
 
-    table = dynamodb_mock.Table(table_name)
-    itemID = 'testID'
-    table.put_item(Item={'itemID': itemID})
 
-    assert 'Item' in table.get_item(Key={'itemID': itemID})
+def test_remove_item(items_table):
+    items_table.put_item(Item={'itemID': '1', 'location': 'Los Angeles', 'timestamp': Decimal('123')})
+    items_table.put_item(Item={'itemID': '2', 'location': 'Los Angeles', 'timestamp': Decimal('123.1')})
 
-    remove_item(table, itemID)
+    remove_item(items_table, '1')
+    response = items_table.scan()
+    items = response['Items']
+    assert len(items) == 1
+    assert items[0]['itemID'] == '2'
 
-    resp = table.get_item(Key={'itemID': itemID})
-    assert 'Item' not in resp
+    remove_item(items_table, '2')
+    response = items_table.scan()
+    items = response['Items']
+    assert len(items) == 0
+
+
+
 
