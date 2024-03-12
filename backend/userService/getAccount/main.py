@@ -46,10 +46,17 @@ def handler(event, context, table=None):
             for key, value in item.items():
                 if isinstance(value, Decimal):
                     item[key] = float(value)
-        return {
-            "statusCode": 200,
-            "body": json.dumps(items)
-        }
+        
+        if len(items) == 1:
+            return {
+                "statusCode": 200,
+                "body": json.dumps(items[0])
+            }
+        else:
+            return {
+                "statusCode": 200,
+                "body": json.dumps(items)
+            } 
     except Exception as e:
         print(f"Exception: {e}")
         return {
