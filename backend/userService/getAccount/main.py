@@ -10,10 +10,12 @@ def handler(event, context, table=None):
         dynamodb_resource = boto3.resource("dynamodb", region_name='ca-central-1')
         table = dynamodb_resource.Table("users-30144999")  
     
-    data = json.loads(event["body"])
+    headers = event["headers"]
+    userID = headers.get('userID') 
+    email = headers.get('email')
     
     # check if request contains userID or email
-    if "userID" not in data and "email" not in data:
+    if not userID and not email:
         return {
             "statusCode": 400,
             "body": json.dumps({
@@ -23,13 +25,13 @@ def handler(event, context, table=None):
     
     try:
         # use gsi for email if request contains email
-        if "email" in data:
+        if email:
             res = table.query(
                 IndexName='EmailIndex',
-                KeyConditionExpression=Key("email").eq(data["email"])
+                KeyConditionExpression=Key("email").eq(email)
             )
         else:
-            res = table.query(KeyConditionExpression=Key("userID").eq(data["userID"]))
+            res = table.query(KeyConditionExpression=Key("userID").eq(userID))
         
         items = res["Items"]
 
