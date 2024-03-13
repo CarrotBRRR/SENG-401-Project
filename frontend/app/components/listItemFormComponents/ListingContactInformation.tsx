@@ -6,7 +6,6 @@ import ListItemFormTemplate from "./ListItemFormTemplate";
 
 export default async function ListingContactInformation() {
   const session = await getServerSession(authOptions);
-
   return (
     <ListItemFormTemplate formNumber={4} formHeader={"Contact information"}>
       <div>
@@ -14,9 +13,9 @@ export default async function ListingContactInformation() {
           <Label htmlFor="phoneNumber" value="Phone Number: (optional)" />
         </div>
         <div className=" mb-2 block">
+          {/* TODO: Phone number needs to appear here */}
           <TextInput
             id="phoneNumber"
-            name="phoneNumber"
             icon={FaPhone}
             placeholder="123 456 7890"
             maxLength={11}
@@ -42,6 +41,13 @@ export default async function ListingContactInformation() {
             value={session?.user?.email || ""}
           />
         </div>
+        <input
+          className="hidden"
+          name="lenderID"
+          // @ts-ignore
+          value={session?.userData[0]?.userID || session?.user?.email}
+          readOnly
+        />
       </div>
     </ListItemFormTemplate>
   );

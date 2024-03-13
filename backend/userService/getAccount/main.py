@@ -15,6 +15,7 @@ def handler(event, context, table=None):
     email = headers.get('email')
     
     # check if request contains userID or email
+
     if not userID and not email:
         return {
             "statusCode": 400,

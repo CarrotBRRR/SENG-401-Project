@@ -11,12 +11,23 @@ export default function UploadImageComponent() {
   const [imageURLs, setImageURLs] = useState<string[]>(
     Array.from({ length: 8 })
   );
-  const handleAddTag = (newImage: File, index: number) => {
+  const maxImageSize = 5 * 1024 * 1024; // 5 MB
+
+  const handleAddImage = (newImage: File, index: number) => {
     if (index >= 8) return;
-    // upload to cloudinary...
+    if (newImage.size > maxImageSize) {
+      alert("Image is too large. Please upload an image smaller than 5MB.");
+      return;
+    }
     setImageURLs((prevURLs) => {
       const updatedURLs = [...prevURLs];
-      updatedURLs[index] = URL.createObjectURL(newImage);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          updatedURLs[index] = e.target.result as string;
+        }
+      };
+      reader.readAsDataURL(newImage);
       return updatedURLs;
     });
     setImages((prevImages) => {
@@ -25,12 +36,18 @@ export default function UploadImageComponent() {
       return updatedImages;
     });
   };
-  const handleRemoveTag = (index: number) => {
+  const handleRemoveImage = (index: number) => {
     if (index >= 8) return;
     setImages((prevImages) => {
       const updatedImages = [...prevImages];
       updatedImages[index] = undefined;
       return updatedImages;
+    });
+    setImageURLs((prevURLs) => {
+      const updatedURLs = [...prevURLs];
+      // @ts-ignore
+      updatedURLs[index] = null;
+      return updatedURLs;
     });
   };
   const MediaImage = ({
@@ -59,8 +76,8 @@ export default function UploadImageComponent() {
             className="hidden"
             accept="image/*"
             onChange={(e) => {
-              if (e.target.files && e.target.files[0]) {
-                handleAddTag(e.target.files[0], index);
+              if (e.target.files?.[0]) {
+                handleAddImage(e.target.files[0], index);
               }
             }}
           />
@@ -68,7 +85,7 @@ export default function UploadImageComponent() {
         <Button
           color={"primary"}
           className="w-full h-12 flex place-content-center justify-center items-center"
-          onClick={() => handleRemoveTag(index)}
+          onClick={() => handleRemoveImage(index)}
         >
           {file === "/missingImage.jpg" ? "" : <FaTimes />}
         </Button>
@@ -79,7 +96,7 @@ export default function UploadImageComponent() {
     <div className="flex flex-row flex-wrap gap-2">
       <input
         className="hidden"
-        name="imageURLs"
+        name="images"
         readOnly
         value={JSON.stringify(imageURLs)}
       />

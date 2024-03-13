@@ -108,25 +108,26 @@ def handler(event, context):
         image_urls = []
         image_hashes = []
         for raw_image in raw_images:
-            image_bytes = base64.b64decode(raw_image)
-            new_image_hash = hashlib.sha256(image_bytes).hexdigest()
-            
-            # If the image has changed, upload it to Cloudinary, and update the image URL and hash
-            if new_image_hash not in old_image_hashes:
-                response = post_image(image_bytes)
-                image_url = response["secure_url"]
-                image_hash = new_image_hash
+            if raw_image is not "null":
+                image_bytes = base64.b64decode(raw_image)
+                new_image_hash = hashlib.sha256(image_bytes).hexdigest()
                 
-            # If the image has not changed, use the old image URL and hash
-            else:
-                image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
-                image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
+                # If the image has changed, upload it to Cloudinary, and update the image URL and hash
+                if new_image_hash not in old_image_hashes:
+                    response = post_image(image_bytes)
+                    image_url = response["secure_url"]
+                    image_hash = new_image_hash
+                    
+                # If the image has not changed, use the old image URL and hash
+                else:
+                    image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
+                    image_url = table.get_item(Key={"itemID": itemID})["Item"]["image"]
 
-                i = old_image_hashes.index(new_image_hash)
-                image_hash = old_image_hashes[i]
+                    i = old_image_hashes.index(new_image_hash)
+                    image_hash = old_image_hashes[i]
 
-            image_urls.append(image_url)
-            image_hashes.append(image_hash)
+                image_urls.append(image_url)
+                image_hashes.append(image_hash)
 
         # Create a new item object
         newInfo = {
@@ -140,7 +141,6 @@ def handler(event, context):
             'imageHashes': image_hashes,
             'lenderID': lenderID,
             'timestamp': timestamp,
-            'borrowerID': None
         }
 
 

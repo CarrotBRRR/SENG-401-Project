@@ -4,10 +4,19 @@ export enum Condition {
   UsedGood = "Used - Good",
   UsedFair = "Used - Fair",
 }
+export enum Category {
+  Other = "Other",
+  Sports = "Sports",
+  Electronics = "Electronics",
+  Furniture = "Furniture",
+  Tools = "Tools",
+  Outdoors = "Outdoors",
+}
 export interface ListItemI {
   title: string;
   condition: Condition;
   description: string;
+  category: Category;
   tags: string[];
   images: (File | undefined)[];
   city: string;

@@ -1,6 +1,13 @@
 import json
 import boto3
 
+#  Parse the event body, convert to dictionary if needed
+def parse_event_body(event_body):
+  if isinstance(event_body, str):
+    return json.loads(event_body)
+  else:
+    return event_body
+
 # Initialize a DynamoDB resource and get the table.
 def get_dynamodb_table(table_name):
     dynamodb = boto3.resource('dynamodb')
@@ -15,7 +22,6 @@ def delete_account(table, userID):
         }
     )
     return response
-  
 
 def handler(event, context):
   try:
@@ -24,9 +30,19 @@ def handler(event, context):
       table = get_dynamodb_table(table_name)
       
       # Retrieve userID and attempt to delete account
-      userID = event['header']['userID']
-      response = delete_account(table, userID)
+      body = parse_event_body(event_body=event['body'])
+      userID = body['userID']
       
+      # Check if user exists
+      response = table.get_item(Key={'userID': userID})
+      if 'Item' not in response:
+        return {
+          'statusCode': 404,
+          'body': json.dumps({'error': 'Item not found'})
+        }
+
+      # If user exists then proceed to delete
+      response = delete_account(table, userID)
       return {
           'statusCode': 200,
           'body': json.dumps(response)
