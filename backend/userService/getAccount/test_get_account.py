@@ -41,7 +41,11 @@ def test_get_user_from_table(dynamodb_mock):
             "location": "Sample location"
         }
     )
-    event = {"body": json.dumps({"userID": userID})}
+    headers = {
+        "userID": userID,
+        "email": "john@example.com"
+    }
+    event = {"headers": headers}
     context = {}
     response = handler(event, context, table)
 
