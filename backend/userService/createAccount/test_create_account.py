@@ -37,6 +37,7 @@ def test_write_user_into_table(dynamodb_mock):
     )
 
     table = dynamodb_mock.Table(table_name)
+
     event = {"body": json.dumps({
         "name": "John Doe",
         "email": "john@example.com",
@@ -48,7 +49,9 @@ def test_write_user_into_table(dynamodb_mock):
     response = handler(event, context, table)
 
     assert response["statusCode"] == 200, "Status code should be 200 for successful execution"
-    response = table.get_item(Key={'userID': json.loads(response['body'])['userID']})
+    
+    inserted_userID = json.loads(response["body"])["userID"]
+    response = table.get_item(Key={'userID': inserted_userID})
     item_in_table = response.get('Item', {})
 
     inserted_item = json.loads(event['body'])
@@ -76,6 +79,7 @@ def test_existing_email(dynamodb_mock):
 
     table = dynamodb_mock.Table(table_name)
     event = {"body": json.dumps({
+        "userID": str(uuid.uuid4()),
         "name": "John Doe",
         "email": "john@example.com",
         "rating": 5,
@@ -107,4 +111,4 @@ def test_missing_field():
     response = handler(event, context)
 
     assert response["statusCode"] == 400, "Status code should be 400 for missing field"
-    assert "Missing required field: email" in response["body"], "Response body should contain 'Missing required field: email' message"
+    assert '{"message": "Missing required field: \'email\'"}' in response["body"], "Response body should contain 'Missing required field: email' message"
