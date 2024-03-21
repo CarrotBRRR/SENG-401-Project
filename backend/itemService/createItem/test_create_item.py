@@ -37,7 +37,6 @@ def test_insert_item_in_table(dynamodb_mock):
         'tags': ['tag', 'you\'re it'],
         'location': 'your mom',
         'image': ["url.com", 'anotherurl.com'],
-        'imageHash': ["HAHAHASH", "anotherHAHAsh"],
         'timestamp': '1234567890',
         'borrowerID': None
     }

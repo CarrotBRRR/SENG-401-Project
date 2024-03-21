@@ -36,7 +36,6 @@ def test_edit_item_in_table(dynamodb_mock):
         'location': 'a location',
         'description': 'a description',
         'images': 'url.com',
-        'imageHashes': 'HAHAHASH',
         'timestamp': '1234567890',
         'borrowerID': None
     }
@@ -57,7 +56,6 @@ def test_edit_item_in_table(dynamodb_mock):
         'location': 'another location',
         'description': 'a new description',
         'images': ['url2.com', 'url3.com'],
-        'imageHashes': ['hashbrown', 'otherthing'],
         'timestamp': '1234567890',
         'borrowerID': None
     }
