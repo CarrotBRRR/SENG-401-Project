@@ -100,7 +100,6 @@ def handler(event, context):
                 'body': json.dumps("Item not found")
             }
 
-        old_image_hashes = item["imageHashes"]
         timestamp = item["timestamp"]
         lenderID = item["lenderID"]
 
@@ -114,13 +113,11 @@ def handler(event, context):
         # Get the image and hashes
         raw_images = body["images"]
         image_urls = []
-        image_hashes = []
         for raw_image in raw_images:
             if raw_image is not None and raw_image != "null":
                 image_bytes = base64.b64decode(raw_image)
-                new_image_hash = hashlib.sha256(image_bytes).hexdigest()
-                # If the image has changed, upload it to Cloudinary, and update the image URL and hash
-                if new_image_hash not in old_image_hashes:
+                # If the image is not a Cloudinary link, upload it to Cloudinary, and update the image URL
+                if not raw_image.startswith("https://res.cloudinary.com") and raw_image is not None:
                 # Save the image to a temp file
                     filename = "/tmp/img.png"
                     stringtime = str(timestamp)
@@ -132,18 +129,12 @@ def handler(event, context):
                         response = post_image(f, stringtime)
 
                     image_url = response["secure_url"]
-                    image_hash = new_image_hash
                     
                 # If the image has not changed, use the old image URL and hash
-                elif new_image_hash in old_image_hashes and new_image_hash is not None:
-                    i = old_image_hashes.index(new_image_hash)
-                    image_hash = old_image_hashes[i]
+                else: 
+                    image_url = raw_image
 
-                    image_url = item["images"][i]
-
-                if image_url is not None and image_hash != "null":
-                    image_urls.append(image_url)
-                    image_hashes.append(image_hash)
+                image_urls.append(image_url)
 
         # Create a new item object
         newInfo = {
@@ -154,7 +145,6 @@ def handler(event, context):
             'category': category,
             'location': location,
             'images': image_urls,
-            'imageHashes': image_hashes,
             'lenderID': lenderID,
             'timestamp': timestamp,
         }

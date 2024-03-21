@@ -107,7 +107,6 @@ def handler(event, context):
         # Image handling
         raw_images = body['images']
         image_urls = []
-        image_hashes = []
         for raw_image in raw_images:
             if raw_image is not None and raw_image != "null":
                 # Decode the image and hash it
@@ -123,7 +122,6 @@ def handler(event, context):
                 # Upload the image to Cloudinary
                 with open(filename, "rb") as f:
                     image_urls.append(post_image(f, stringtime)["secure_url"])
-                    image_hashes.append(image_hash)
 
         # Prepare the data to be inserted into the table
         data = {
@@ -134,7 +132,6 @@ def handler(event, context):
             'category': category,
             'location': location,
             'images': image_urls,
-            'imageHashes': image_hashes,
             'lenderID': lenderID,
             'timestamp': timestamp,
         }

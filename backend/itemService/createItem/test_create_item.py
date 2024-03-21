@@ -37,7 +37,6 @@ def test_insert_item_in_table(dynamodb_mock):
         'tags': ['tag', 'you\'re it'],
         'location': 'your mom',
         'image': ["url.com", 'anotherurl.com'],
-        'imageHash': ["HAHAHASH", "anotherHAHAsh"],
         'timestamp': '1234567890',
         'borrowerID': None
     }
@@ -62,5 +61,4 @@ def test_insert_item_in_table(dynamodb_mock):
     assert response['Item']['tags'] == ['tag', 'you\'re it']
 
     assert response['Item']['image'] == ["url.com", 'anotherurl.com']
-    assert response['Item']['imageHash'] == ["HAHAHASH", "anotherHAHAsh"]
 
