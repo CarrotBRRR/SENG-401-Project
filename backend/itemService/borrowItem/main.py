@@ -20,20 +20,6 @@ def parse_event_body(event_body):
         return json.loads(event_body)
     return event_body
 
-def append_approved_in_table(table, itemID, borrowerID):
-    """Update an item in the DynamoDB table."""
-    response = table.update_item(
-        Key={
-            'itemID': itemID
-        },
-        UpdateExpression="set borrowRequests = :b",
-        ExpressionAttributeValues={
-            ':b': borrowerID
-        },
-        ReturnValues="UPDATED_NEW"
-    )
-    return response
-
 def update_start_end_dates_in_table(table, itemID, startDate, endDate):
     """Update the start and end dates in the DynamoDB table."""
     response = table.update_item(
@@ -57,6 +43,34 @@ def remove_borrower_id_from_borrow_requests(table, itemID, borrowerID_index):
         },
         UpdateExpression="REMOVE borrowRequests[{}]"
         .format(borrowerID_index),
+        ReturnValues="UPDATED_NEW"
+    )
+    return response
+
+def update_current_borrower_in_table(table, itemID, borrowerID):
+    """Update the current borrower in the DynamoDB table."""
+    response = table.update_item(
+        Key={
+            'itemID': itemID
+        },
+        UpdateExpression="set borrowerID = :b",
+        ExpressionAttributeValues={
+            ':b': borrowerID
+        },
+        ReturnValues="UPDATED_NEW"
+    )
+    return response
+
+def set_borrow_requests_in_table(table, itemID, requests):
+    """Update an item in the DynamoDB table."""
+    response = table.update_item(
+        Key={
+            'itemID': itemID
+        },
+        UpdateExpression="set borrowRequests = :b",
+        ExpressionAttributeValues={
+            ':b': requests
+        },
         ReturnValues="UPDATED_NEW"
     )
     return response
@@ -88,26 +102,31 @@ def handler(event, context):
             'borrowerID': borrowerID,
             'startDate': startDate,
             'endDate': endDate,
-            'status': 'approved'
+            'status': 'active'
         }
 
-        response = remove_borrower_id_from_borrow_requests(table, itemID, borrowerID_index)
+        responses = []
 
-        item_to_update = table.get_item(
+        # remove original request from borrowRequests
+        responses.append(remove_borrower_id_from_borrow_requests(table, itemID, borrowerID_index))
+
+        # retrieve item again to get updated borrowRequests
+        item_removed_request = table.get_item(
             Key={'itemID': itemID}
         )
 
-        requests = item_to_update['Item']['borrowRequests']
+        # append updated request to borrowRequests
+        requests = item_removed_request['Item']['borrowRequests']
         requests.append(new_request)
 
-        borrow_requests = item_to_update['Item']['borrowRequests']
+        # update borrowRequests, startDate, endDate, and borrowerID
+        responses.append(set_borrow_requests_in_table(table, itemID, requests))
+        responses.append(update_start_end_dates_in_table(table, itemID, startDate, endDate))
+        responses.append(update_current_borrower_in_table(table, itemID, borrowerID))
 
-        response = update_start_end_dates_in_table(table, itemID, startDate, endDate)
-
-        response = append_approved_in_table(table, itemID, borrowerID)
         return {
             'statusCode': 200,
-            'body': json.dumps(response, default=decimal_default)
+            'body': json.dumps(responses, default=decimal_default)
         }
     except Exception as e:
         return {
