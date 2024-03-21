@@ -20,13 +20,13 @@ def parse_event_body(event_body):
         return json.loads(event_body)
     return event_body
 
-def update_item_in_table(table, itemID, borrowerID):
+def append_approved_in_table(table, itemID, borrowerID):
     """Update an item in the DynamoDB table."""
     response = table.update_item(
         Key={
             'itemID': itemID
         },
-        UpdateExpression="set borrowerID = :b",
+        UpdateExpression="set borrowRequests = :b",
         ExpressionAttributeValues={
             ':b': borrowerID
         },
@@ -79,14 +79,32 @@ def handler(event, context):
         if borrowerID_index is None:
             raise ValueError("Borrower ID not found in borrow requests")
         
-        borrowerID_item = borrow_requests[borrowerID_index]
-        startDate = Decimal(borrowerID_item['startDate'])
-        endDate = Decimal(borrowerID_item['endDate'])
+        request = borrow_requests[borrowerID_index]
+
+        startDate = Decimal(request['startDate'])
+        endDate = Decimal(request['endDate'])
+
+        new_request = {
+            'borrowerID': borrowerID,
+            'startDate': startDate,
+            'endDate': endDate,
+            'status': 'approved'
+        }
+
         response = remove_borrower_id_from_borrow_requests(table, itemID, borrowerID_index)
+
+        item_to_update = table.get_item(
+            Key={'itemID': itemID}
+        )
+
+        requests = item_to_update['Item']['borrowRequests']
+        requests.append(new_request)
+
+        borrow_requests = item_to_update['Item']['borrowRequests']
 
         response = update_start_end_dates_in_table(table, itemID, startDate, endDate)
 
-        response = update_item_in_table(table, itemID, borrowerID)
+        response = append_approved_in_table(table, itemID, borrowerID)
         return {
             'statusCode': 200,
             'body': json.dumps(response, default=decimal_default)
