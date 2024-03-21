@@ -42,6 +42,24 @@ def remove_start_end_dates_from_item(table, itemID):
     )
     return response
 
+def move_borrow_request_to_past_requests(table, itemID, data):
+    """Move a borrow request to the pastRequests array in the DynamoDB table."""
+    item = table.get_item(Key={'itemID': itemID})
+    borrow_requests = item.get('Item', {}).get('pastRequests', [])
+
+    borrow_requests.append(data)
+
+    response = table.update_item(
+        Key={
+            'itemID': itemID
+        },
+        UpdateExpression="SET pastRequests = :br",
+        ExpressionAttributeValues={
+            ':br': data
+        },
+        ReturnValues="UPDATED_NEW"
+    )
+    return response
 
 def handler(event, context):
     try:
@@ -49,15 +67,38 @@ def handler(event, context):
         table = get_dynamodb_table(table_name)
         body = parse_event_body(event["body"])
         itemID = body["itemID"]
+        borrowerID = body["borrowerID"]
 
-        response = remove_start_end_dates_from_item(table, itemID)
+        item = table.get_item(Key={'itemID': itemID})
+
+        if "borrowerID" not in item["Item"]:
+            raise ValueError("Item is not currently being borrowed")
         
-        response = remove_borrowerID_from_item(table, itemID)
+        elif item["Item"]["borrowerID"] != borrowerID:
+            raise ValueError("Item is not currently being borrowed by the specified borrowerID")
+        
+        startDate = item["Item"]["startDate"]
+        endDate = item["Item"]["endDate"]
+
+        data = {
+            "borrowerID": borrowerID,
+            "startDate": startDate,
+            "endDate": endDate,
+            "status": "returned"
+        }
+        
+        responses = []
+
+        responses.append(remove_start_end_dates_from_item(table, itemID))
+        
+        responses.append(remove_borrowerID_from_item(table, itemID))
+
+        responses.append(move_borrow_request_to_past_requests(table, itemID, data))
         
         
         return {
             'statusCode': 200,
-            'body': json.dumps(response, default=decimal_default)
+            'body': json.dumps(responses, default=decimal_default)
         }
     except Exception as e:
         return {
