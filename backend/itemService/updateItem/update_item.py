@@ -117,7 +117,10 @@ def handler(event, context):
             if raw_image is not None and raw_image != "null":
                 image_bytes = base64.b64decode(raw_image)
                 # If the image is not a Cloudinary link, upload it to Cloudinary, and update the image URL
-                if not raw_image.startswith("https://res.cloudinary.com") and raw_image is not None:
+                if raw_image.startswith("https://res.cloudinary.com/"):
+                    image_url = raw_image
+
+                else: 
                 # Save the image to a temp file
                     filename = "/tmp/img.png"
                     stringtime = str(timestamp)
@@ -130,9 +133,8 @@ def handler(event, context):
 
                     image_url = response["secure_url"]
                     
-                # If the image has not changed, use the old image URL and hash
-                else: 
-                    image_url = raw_image
+
+                    
 
                 image_urls.append(image_url)
 
