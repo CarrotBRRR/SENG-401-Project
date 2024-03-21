@@ -100,7 +100,6 @@ def handler(event, context):
                 'body': json.dumps("Item not found")
             }
 
-        old_image_hashes = item["imageHashes"]
         timestamp = item["timestamp"]
         lenderID = item["lenderID"]
 
