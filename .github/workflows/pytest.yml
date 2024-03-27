@@ -22,15 +22,14 @@ jobs:
           - './backend/itemService/getLenderItems/'
           - './backend/itemService/getBorrowedItems/'
           - './backend/itemService/getItemFromID/'
+          - './backend/itemService/cancelRequest/'
           - './backend/userService/createAccount/'
           - './backend/userService/deleteAccount/'
           - './backend/userService/getAccount/'
           - './backend/userService/updateAccount/'
           - './backend/userService/updateAverageAccountRating/'
-
+        
       fail-fast: false
-
-
 
     steps:
     - uses: actions/checkout@v4

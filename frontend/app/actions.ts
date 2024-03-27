@@ -313,41 +313,44 @@ export const deleteItem = async (itemID: string) => {
 };
 
 export const borrowItem = async (itemID: string, borrowerID: string) => {
-  const session: SuperSession | null = await getServerSession(authOptions);
-  if (!session) {
-    console.log("No session found");
-    return;
-  }
-  const response = await fetch(BORROW_ITEM_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      accessToken: JSON.stringify(session.token.accessToken),
-    },
-    body: JSON.stringify({
-      itemID: itemID,
-      borrowerID: borrowerID,
-    }),
-  });
+  try {
+    const session: SuperSession | null = await getServerSession(authOptions);
+    if (!session) {
+      console.log("No session found");
+      return;
+    }
+    const response = await fetch(BORROW_ITEM_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        accessToken: JSON.stringify(session.token.accessToken),
+      },
+      body: JSON.stringify({
+        itemID: itemID,
+        borrowerID: borrowerID,
+      }),
+    });
 
-  if (response.status !== 200) {
-    const errorMessage =
-      "Failed to borrow item. Status code: " + response.status;
-    console.error(errorMessage);
-    return errorMessage;
+    if (response.status !== 200) {
+      const errorMessage =
+        "Failed to borrow item. Status code: " + response.status;
+      console.error(errorMessage);
+      return errorMessage;
+    }
+    revalidatePath(`/requested`);
+    return "Item borrowed successfully";
+  } catch (error) {
+    console.error("Error borrowing item:", error);
+    return `Error borrowing item: ${error}`;
   }
-
-  return response;
 };
-
 export const cancelRequest = async (itemID: string, borrowerID: string) => {
+  try{
   const session: SuperSession | null = await getServerSession(authOptions);
   if (!session) {
     console.log("No session found");
     return;
   }
-  console.log("hello");
-  console.log(session.token.accessToken);
   const response = await fetch(
     "https://kwvu2ae5lllfz77k5znkrvnrii0brzuf.lambda-url.ca-central-1.on.aws/",
     {
@@ -363,14 +366,18 @@ export const cancelRequest = async (itemID: string, borrowerID: string) => {
     }
   );
 
-  if (response.status !== 200) {
+  if (!response.ok) {
     const errorMessage =
       "Failed to decline request. Status code: " + response.status;
     console.error(errorMessage);
     return errorMessage;
   }
-  return response;
-};
+  revalidatePath(`/requested`);
+  return "Request declined successfully";
+} catch (error) {
+  console.error("Error declining request:", error);
+  return `Error declining request: ${error}`;
+};}
 
 export const getItemPage = async ({
   location = "Calgary, Alberta, Canada",
@@ -622,16 +629,19 @@ export const sendBorrowedItemEmail = async (itemID: string) => {
       console.log("No session found");
       return;
     }
-    const response = await fetch("https://4ig6rd4axaer54xv3auyvgajq40edups.lambda-url.ca-central-1.on.aws/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        accessToken: JSON.stringify(session.token.accessToken),
-      },
-      body: JSON.stringify({
-        itemID: itemID,
-      }),
-    });
+    const response = await fetch(
+      "https://4ig6rd4axaer54xv3auyvgajq40edups.lambda-url.ca-central-1.on.aws/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accessToken: JSON.stringify(session.token.accessToken),
+        },
+        body: JSON.stringify({
+          itemID: itemID,
+        }),
+      }
+    );
 
     if (response.status !== 200) {
       const errorMessage =
