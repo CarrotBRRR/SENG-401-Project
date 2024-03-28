@@ -58,10 +58,7 @@ def items_table(dynamodb_mock):
 def test_parse_event_body():
     assert parse_event_body('{"key": "value"}') == {"key": "value"}
     assert parse_event_body({"key": "value"}) == {"key": "value"}
-
-
-
-
+    
 def populate_table_with_items(table):
     """Helper function to populate table with a mix of items."""
     items = [
@@ -148,7 +145,6 @@ def test_pagination_with_search(items_table):
     assert len(fetched_items) == 2, "Should fetch exactly 2 items"
     assert fetched_items[0]['itemName'] == 'New thing', "Should fetch the correct items"
     assert fetched_items[1]['itemName'] == 'Used hammer', "Should fetch the correct items"
-
 
 # test fetch_items_with_pagination with search = None and category = Adventure
 def test_pagination_with_category(items_table):
