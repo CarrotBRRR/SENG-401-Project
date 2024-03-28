@@ -74,16 +74,6 @@ def populate_table_with_items(table):
     for item in items:
         table.put_item(Item=item)
 
-# def test_pagination_with_exact_page_size(items_table):
-#     """Test fetching items where the number of items exactly matches the page size."""
-#     populate_table_with_items(items_table)
-#     # Assuming populate_table_with_items adds 3 items without borrowerID
-#     fetched_items, last_evaluated_key = fetch_items_with_pagination(
-#         'items-30144999', 'loc1', None, 3
-#     )
-#     assert len(fetched_items) == 3, "Should fetch exactly 3 items"
-#     assert last_evaluated_key is None, "There should not be a next page"
-
 def test_pagination_with_additional_queries_needed(items_table):
     """Test fetching items where additional queries are needed due to filtered items."""
     populate_table_with_items(items_table)
@@ -93,21 +83,6 @@ def test_pagination_with_additional_queries_needed(items_table):
     )
     assert len(fetched_items) == 2, "Should fetch exactly 2 items"
     assert last_evaluated_key is not None, "There should be more items available"
-
-# def test_pagination_last_page_with_fewer_items(items_table):
-#     """Test fetching the last page of items when there are fewer items than the page size."""
-#     populate_table_with_items(items_table)
-#     # First, fetch 2 items to simulate partial consumption
-#     _, last_evaluated_key = fetch_items_with_pagination(
-#         'items-30144999', 'loc1', None, 2
-#     )
-#     # Now, fetch with the last_evaluated_key to get the last page
-#     fetched_items, last_evaluated_key_next = fetch_items_with_pagination(
-#         'items-30144999', 'loc1', last_evaluated_key, 2
-#     )
-#     # Assuming there was 1 item left without borrowerID
-#     assert len(fetched_items) == 1, "Should fetch exactly 1 remaining item"
-#     assert last_evaluated_key_next is None, "There should not be more items available"
 
 def test_pagination_with_no_matching_items(items_table):
     """Test fetching items when none match the filter criteria."""
@@ -135,27 +110,6 @@ def populate_large_table(table, num_items, num_borrowed_items):
         if i in borrowed_indices:
             item['borrowerID'] = 'borrower' + str(i)
         table.put_item(Item=item)
-
-# def test_pagination_without_duplicates(items_table):
-#     """Test fetching multiple pages without duplicating items across pages."""
-#     populate_large_table(items_table, 21, 10)
-
-#     # Fetch the first page with 10 items
-#     first_page_items, last_evaluated_key = fetch_items_with_pagination(
-#         'items-30144999', 'loc1', None, 10
-#     )
-#     assert len(first_page_items) == 10, "First page should contain exactly 10 items"
-
-#     # Use the LastEvaluatedKey to fetch the next page
-#     second_page_items, _ = fetch_items_with_pagination(
-#         'items-30144999', 'loc1', last_evaluated_key, 10
-#     )
-#     assert len(second_page_items) == 1, "Second page should contain 1 item"
-
-#     # Verify no duplicates between first page and second page
-#     first_page_ids = {item['itemID'] for item in first_page_items}
-#     second_page_ids = {item['itemID'] for item in second_page_items}
-#     assert first_page_ids.isdisjoint(second_page_ids), "No item should appear on both the first and second pages"
 
 def test_pagination_with_search(items_table):
     """Test fetching items with a search query."""
@@ -280,4 +234,3 @@ def test_handler_with_valid_location_and_pagecount(items_table):
     last_evaluated_key = body['last_evaluated_key']
     assert response['statusCode'] == 200, "Should return a 200 status code"
     assert len(items) == 5, "Should return 5 items"
-
